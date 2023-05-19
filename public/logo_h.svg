@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X8 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="150.373mm" height="31.7572mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 9267 1957"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <style type="text/css">
+   <![CDATA[
+    .fil0 {fill:#066D87}
+    .fil1 {fill:white}
+    .fil2 {fill:#333333;fill-rule:nonzero}
+   ]]>
+  </style>
+ </defs>
+ <g id="Camada_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_2061552742976">
+   <rect class="fil0" width="2142" height="1957"/>
+   <path class="fil1" d="M1788 1217c-18,-237 -167,-352 -430,-352l-637 0c-107,0 -174,-63 -174,-169 0,-105 65,-170 176,-170l998 0 0 -243 -998 0c-278,0 -429,167 -429,390 0,230 163,396 425,396l639 0c117,0 188,50 201,148l229 0zm-921 214l-552 0 0 243 552 0 0 -243z"/>
+   <path class="fil2" d="M3164 1560c331,0 570,-256 570,-593 0,-338 -234,-570 -570,-570l-283 0c-324,0 -564,227 -564,570 0,337 240,593 564,593l283 0zm-283 -203c-209,0 -361,-162 -361,-381 0,-221 153,-376 361,-376l283 0c215,0 367,157 367,376 0,219 -152,381 -367,381l-283 0z"/>
+   <polygon id="1" class="fil2" points="4884,1560 4884,1357 4102,1357 4102,397 3898,397 3898,1560 "/>
+   <path id="2" class="fil2" d="M5843 1560c331,0 570,-256 570,-593 0,-338 -234,-570 -570,-570l-283 0c-325,0 -564,227 -564,570 0,337 239,593 564,593l283 0zm-283 -203c-209,0 -361,-162 -361,-381 0,-221 153,-376 361,-376l283 0c214,0 366,157 366,376 0,219 -152,381 -366,381l-283 0z"/>
+   <path id="3" class="fil2" d="M7945 1560l-351 -354c151,-57 240,-193 240,-385 0,-259 -156,-424 -422,-424l-835 0 0 1163 202 0 0 -960 633 0c139,0 222,74 222,224 0,151 -76,234 -222,234l-484 0 0 179 435 0 294 323 288 0z"/>
+   <polygon id="4" class="fil2" points="8648,1560 8648,1119 9267,397 9008,397 8554,933 8101,397 7828,397 8445,1119 8445,1560 "/>
+  </g>
+ </g>
+</svg>

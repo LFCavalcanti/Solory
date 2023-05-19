@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: CorelDRAW X8 -->
+<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="150.373mm" height="31.7572mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd"
+viewBox="0 0 9267 1957"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <font id="FontID0" horiz-adv-x="988" font-variant="normal" style="fill-rule:nonzero" font-style="normal" font-weight="400">
+	<font-face 
+		font-family="Good Times Rg">
+		<font-face-src>
+			<font-face-name name="GoodTimesRg-Regular"/>
+		</font-face-src>
+	</font-face>
+   <missing-glyph><path d="M0 0z"/></missing-glyph>
+   <glyph unicode="y" horiz-adv-x="925" d="M526.001 0l0 276 386.999 451.001 -161.999 0 -284 -335.001 -283.002 335.001 -170.997 0 385.997 -451.001 0 -276 127.002 0z"/>
+   <glyph unicode="r" horiz-adv-x="921" d="M917.998 0l-219 221c94.0013,35.999 150,120.999 150,240.999 0,161.999 -97.9974,265.002 -263.997,265.002l-522.001 0 0 -727.002 126 0 0 599.999 396.001 0c86.9996,0 138.998,-45.9988 138.998,-140 0,-93.9975 -47.9987,-146 -138.998,-146l-303.001 0 0 -112.001 272 0 183.999 -201.998 179.999 0z"/>
+   <glyph unicode="o" horiz-adv-x="968" d="M572 0c207,0 356.002,160 356.002,371 0,211 -146.004,356.002 -356.002,356.002l-177.001 0c-203,0 -353,-142 -353,-356.002 0,-211 150,-371 353,-371l177.001 0zm-177.001 126.999c-130.998,0 -225.998,101.003 -225.998,238.001 0,138 95.9974,234.999 225.998,234.999l177.001 0c134,0 229,-97.9974 229,-234.999 0,-136.998 -94.9994,-238.001 -229,-238.001l-177.001 0z"/>
+   <glyph unicode="l" horiz-adv-x="706" d="M678.999 0l0 126.999 -489 0 0 600.003 -126.999 0 0 -727.002 615.999 0z"/>
+  </font>
+  <style type="text/css">
+   <![CDATA[
+    @font-face { font-family:"Good Times Rg";font-variant:normal;font-style:normal;font-weight:normal;src:url("#FontID0") format(svg)}
+    .fil0 {fill:#066D87}
+    .fil2 {fill:#333333}
+    .fil1 {fill:white}
+    .fnt0 {font-weight:normal;font-size:1599.31px;font-family:'Good Times Rg'}
+   ]]>
+  </style>
+ </defs>
+ <g id="Camada_x0020_1">
+  <metadata id="CorelCorpID_0Corel-Layer"/>
+  <g id="_2061518008800">
+   <rect class="fil0" width="2142" height="1957"/>
+   <path class="fil1" d="M1788 1217c-18,-237 -167,-352 -430,-352l-637 0c-107,0 -174,-63 -174,-169 0,-105 65,-170 176,-170l998 0 0 -243 -998 0c-278,0 -429,167 -429,390 0,230 163,396 425,396l639 0c117,0 188,50 201,148l229 0zm-921 214l-552 0 0 243 552 0 0 -243z"/>
+   <text x="2250" y="1560"  class="fil2 fnt0">olory</text>
+  </g>
+ </g>
+</svg>
