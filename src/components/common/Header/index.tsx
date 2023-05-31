@@ -1,5 +1,7 @@
+'use client';
 import { Image } from '@chakra-ui/next-js';
 import { Flex } from '@chakra-ui/react';
+import SessionHeader from '../SessionHeader';
 
 export default function Header() {
   return (
@@ -11,6 +13,7 @@ export default function Header() {
       padding={3}
     >
       <Image src="/logo_h.svg" alt="Solory" width={200} height={42} />
+      <SessionHeader />
     </Flex>
   );
 }
