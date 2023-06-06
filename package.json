@@ -13,6 +13,8 @@
     "@chakra-ui/react": "^2.6.1",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@fontsource/open-sans": "^5.0.2",
+    "@fontsource/roboto": "^5.0.2",
     "@prisma/client": "^4.14.1",
     "@types/pg": "^8.6.6",
     "bcrypt": "^5.1.0",

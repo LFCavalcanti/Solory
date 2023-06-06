@@ -11,7 +11,9 @@ interface Props {
 export default function ChakraUiProvider({ children }: Props) {
   return (
     <CacheProvider>
-      <ChakraProvider theme={soloryTheme}>{children}</ChakraProvider>
+      <ChakraProvider theme={soloryTheme} resetCSS>
+        {children}
+      </ChakraProvider>
     </CacheProvider>
   );
 }
