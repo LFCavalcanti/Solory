@@ -1,4 +1,3 @@
-import Header from '@/components/common/Header';
 import AuthSessionProvider from '@/components/providers/AuthSessionProvider';
 import ChakraUiProvider from '@/components/providers/ChakraUiProvider';
 
@@ -19,10 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthSessionProvider>
-          <ChakraUiProvider>
-            <Header />
-            {children}
-          </ChakraUiProvider>
+          <ChakraUiProvider>{children}</ChakraUiProvider>
         </AuthSessionProvider>
       </body>
     </html>

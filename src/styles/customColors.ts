@@ -55,8 +55,10 @@ export const customColors = {
   text: {
     standard: '#333333',
     darkMode: '#f2f2f2',
+    light: '#f2f2f2',
   },
   error: '#FF7C80',
   alert: '#FFD859',
   success: '#60B99A',
+  backgroundLight: '#f2f2f2',
 };

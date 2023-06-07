@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import verifyAccessToken from './lib/tokens/verifyAccessToken';
 
 export async function middleware(request: NextRequest) {
+  //API PROTECTION
   if (request.nextUrl.pathname.startsWith('/api/internal')) {
     const accessToken = request.headers.get('authorization');
     const verifiedToken =
@@ -23,6 +24,8 @@ export async function middleware(request: NextRequest) {
       );
     }
   }
+
+  //INTERNAL PAGES PROTECTION
   if (request.nextUrl.pathname.startsWith('/internal')) {
     const token = await getToken({
       req: request,
@@ -34,8 +37,20 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
   }
+
+  //IF USER HAS SESSION PREVENT LOADING LOGIN PAGE
+  if (request.nextUrl.pathname.startsWith('/login')) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+    if (token) {
+      const url = new URL('internal/dashboard', process.env.NEXTAUTH_URL || '');
+      return NextResponse.redirect(url);
+    }
+  }
 }
 
 export const config = {
-  matcher: ['/internal/:path*', '/api/internal/:path*'],
+  matcher: ['/internal/:path*', '/api/internal/:path*', '/login'],
 };

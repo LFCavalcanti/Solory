@@ -42,7 +42,8 @@ export const ButtonStyles = {
     },
     contrast: {
       bg: 'contrast.500',
-      color: 'text.darkMode',
+      color: 'text.standard',
+      fontWeight: 700,
       _hover: {
         bg: 'contrast.300',
       },
