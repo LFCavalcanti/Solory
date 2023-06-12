@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.11.0",
     "@fontsource/open-sans": "^5.0.2",
     "@fontsource/roboto": "^5.0.2",
+    "@hookform/resolvers": "^3.1.0",
     "@prisma/client": "^4.14.1",
     "@types/pg": "^8.6.6",
     "bcrypt": "^5.1.0",
@@ -26,6 +27,7 @@
     "pg": "^8.11.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.44.3",
     "zod": "^3.21.4"
   },
   "devDependencies": {

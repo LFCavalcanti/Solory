@@ -10,29 +10,30 @@ interface requestBody {
 export async function POST(request: Request) {
   const body: requestBody = await request.json();
 
-  const user = await prisma.user.findFirst({
-    where: {
-      email: body.username,
-    },
-  });
-
-  if (user && (await bcrypt.compare(body.password, user.password))) {
-    const { password, ...userWithoutPass } = user;
-    const accessToken = await signAccessToken(JSON.stringify(userWithoutPass));
-    console.log(accessToken);
-    const result = {
-      ...userWithoutPass,
-      accessToken,
-    };
-    return new Response(JSON.stringify(result));
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email: body.username,
+      },
+    });
+    if (user && (await bcrypt.compare(body.password, user.password))) {
+      const { password, ...userWithoutPass } = user;
+      const accessToken = await signAccessToken(
+        JSON.stringify(userWithoutPass),
+      );
+      const result = {
+        ...userWithoutPass,
+        accessToken,
+      };
+      return new Response(JSON.stringify(result));
+    }
+  } catch (err) {
+    return new Response(JSON.stringify('Service unavailable'), {
+      status: 503,
+    });
   }
 
-  return new Response(
-    JSON.stringify({
-      error: 'Credentials are invalid',
-    }),
-    {
-      status: 401,
-    },
-  );
+  return new Response(JSON.stringify('Credentials are invalid'), {
+    status: 401,
+  });
 }

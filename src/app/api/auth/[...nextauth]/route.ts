@@ -28,7 +28,6 @@ const handler = NextAuth({
             password: credentials?.password,
           }),
         });
-
         const user = await res.json();
 
         if (user.id && res.status === 200) {
@@ -45,16 +44,17 @@ const handler = NextAuth({
   ],
   pages: {
     signIn: '/login',
-  },
+    newUser: '/signup',
+  } /*,
   callbacks: {
     async jwt({ token, user }) {
       return { ...token, ...user };
-    },
+    } ,
     async session({ session, token }) {
       session.user = token as any;
       return session;
     },
-  },
+  }*/,
 });
 
 export { handler as GET, handler as POST };

@@ -2,8 +2,10 @@
 import { Flex, Button, Text } from '@chakra-ui/react';
 import { signIn } from 'next-auth/react';
 import { Image } from '@chakra-ui/next-js';
+import { useRouter } from 'next/navigation';
 
 export default function IndexPage() {
+  const { push } = useRouter();
   return (
     <Flex
       height="100vh"
@@ -25,7 +27,11 @@ export default function IndexPage() {
         <Button variant="primary" margin={1} onClick={() => signIn()}>
           Acessar
         </Button>
-        <Button variant="secondaryOutline" margin={1}>
+        <Button
+          variant="secondaryOutline"
+          margin={1}
+          onClick={() => push('/signup')}
+        >
           Cadastrar
         </Button>
       </Flex>

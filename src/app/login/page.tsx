@@ -24,25 +24,41 @@ import {
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { z } from 'zod';
 
 export default function LoginPage() {
   const callbackUrl = '/internal/dashboard';
+  const validadeEmail = z.string().email();
   const { push } = useRouter();
   const [username, setUserName] = useState('');
   const [password, setPassword] = useState('');
-  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [invalidCredentials, setInvalidCredentials] = useState(false);
 
   const tryLogin = async (event: React.FormEvent) => {
     event.preventDefault();
+    const validatedUsername = validadeEmail.safeParse(username);
+    const validatedPassword = z.string().min(8).safeParse(password);
+
+    if (!validatedUsername.success) {
+      setInvalidEmail(true);
+      return;
+    } else {
+      setInvalidEmail(false);
+    }
+
+    if (!validatedPassword.success) {
+      setInvalidCredentials(true);
+      return;
+    }
+
     const result = await signIn('credentials', {
       username,
       password,
       redirect: false,
     });
-    console.log(result);
-    if (result?.error) {
+    if (result?.status !== 200) {
       setInvalidCredentials(true);
       return;
     }
@@ -99,7 +115,7 @@ export default function LoginPage() {
           />
           <Flex direction="column" background="primary.500" p={12} rounded={0}>
             <form onSubmit={tryLogin}>
-              <FormControl isInvalid={isEmailValid}>
+              <FormControl isInvalid={invalidEmail}>
                 <FormLabel color="text.light">Email</FormLabel>
                 <Input
                   value={username}
