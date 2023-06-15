@@ -42,16 +42,30 @@ model User {
   name          String?
   email         String?   @unique
   emailVerified DateTime?
-  password      String
+  password      String?
   image         String?
   accounts      Account[]
   sessions      Session[]
+  emailValidationTokens emailValidationToken[]
 }
 
 model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model emailValidationToken {
+  identifier  String   @id @default(cuid())
+  token       String   @unique @db.Text
+  createdAt   DateTime
+  expiresAt   DateTime
+  ActivatedAt DateTime?
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
 
   @@unique([identifier, token])
 }

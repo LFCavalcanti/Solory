@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "migrate:dev": "prisma migrate dev && prisma generate"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.19",
@@ -18,6 +19,7 @@
     "@fontsource/roboto": "^5.0.2",
     "@hookform/resolvers": "^3.1.0",
     "@prisma/client": "^4.14.1",
+    "@sendgrid/mail": "^7.7.0",
     "@types/pg": "^8.6.6",
     "bcrypt": "^5.1.0",
     "framer-motion": "^10.12.12",

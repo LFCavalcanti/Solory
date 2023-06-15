@@ -16,7 +16,11 @@ export async function POST(request: Request) {
         email: body.username,
       },
     });
-    if (user && (await bcrypt.compare(body.password, user.password))) {
+    if (
+      user &&
+      user.password &&
+      (await bcrypt.compare(body.password, user.password))
+    ) {
       const { password, ...userWithoutPass } = user;
       const accessToken = await signAccessToken(
         JSON.stringify(userWithoutPass),
