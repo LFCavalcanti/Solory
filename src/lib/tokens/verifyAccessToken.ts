@@ -1,4 +1,4 @@
-import { UnsecuredJWT, jwtVerify } from 'jose';
+import { jwtVerify } from 'jose';
 import getJwtAccessSecretKey from './getJwtAccessSecretKey';
 
 interface AccessJwtPayload {

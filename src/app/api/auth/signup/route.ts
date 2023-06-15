@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
     return new Response(JSON.stringify(result));
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return new Response(JSON.stringify('Service unavailable'), {
       status: 503,
     });

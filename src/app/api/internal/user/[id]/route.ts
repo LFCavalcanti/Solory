@@ -2,20 +2,9 @@
 import prisma from '@/lib/prisma';
 
 interface Params {
-  id: number;
+  id: string;
 }
 export async function GET(request: Request, params: Params) {
-  /* const accessToken = request.headers.get('authorization');
-  if (!accessToken || !verifyJwt(accessToken)) {
-    return new Response(
-      JSON.stringify({
-        error: 'unauthorized',
-      }),
-      {
-        status: 401,
-      },
-    );
-  } */
   const user = await prisma.user.findFirst({
     where: {
       id: params.id,

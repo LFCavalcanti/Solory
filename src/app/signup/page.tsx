@@ -47,7 +47,6 @@ export default function IndexPage() {
   });
 
   const submitUser: SubmitHandler<tNewUser> = async (data) => {
-    console.log(data);
     setIsProcessing(true);
 
     const createdCredential = await fetch(
