@@ -11,8 +11,8 @@ interface requestBody {
 export async function POST(request: Request) {
   const body: requestBody = await request.json();
   const currentDate = new Date();
-
   try {
+    if (!body.id) throw new Error('User ID was not supplied');
     const user = await prisma.user.findFirst({
       where: {
         id: body.id,
@@ -20,9 +20,15 @@ export async function POST(request: Request) {
     });
 
     if (user && user.emailVerified) {
-      return new Response(JSON.stringify('User e-mail already verified.'), {
-        status: 409,
-      });
+      return new Response(
+        JSON.stringify({
+          alreadyVerified: true,
+          message: 'User e-mail already verified.',
+        }),
+        {
+          status: 409,
+        },
+      );
     }
 
     const existingValidationEntry = await prisma.emailValidationToken.findFirst(
@@ -54,7 +60,12 @@ export async function POST(request: Request) {
           user.email,
         );
         sendgridClientSender(message);
-        return new Response(JSON.stringify('Verification sent - again'));
+        return new Response(
+          JSON.stringify({
+            alreadySent: true,
+            message: 'Verification sent - again',
+          }),
+        );
       }
       return new Response(
         JSON.stringify({
@@ -95,7 +106,15 @@ export async function POST(request: Request) {
 
       sendgridClientSender(message);
 
-      return new Response(JSON.stringify('Verification sent'));
+      return new Response(
+        JSON.stringify({
+          expiration: newValidationEntry.expiresAt,
+          messsage: 'Verification sent',
+        }),
+        {
+          status: 200,
+        },
+      );
     }
   } catch (err) {
     console.error(err);

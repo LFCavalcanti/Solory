@@ -12,16 +12,16 @@ export async function POST(
     (await verifyEmailVerificationToken(params.token).catch((error) => {
       console.error(error);
     }));
-  if (!verifiedToken)
+  if (!verifiedToken) {
     return new Response(
       JSON.stringify({
-        error: 'Unauthorized or token expired',
+        message: 'Unauthorized or token expired',
       }),
       {
         status: 401,
       },
     );
-
+  }
   const userData = JSON.parse(verifiedToken.jti);
   try {
     const user = await prisma.user.findFirst({
@@ -31,9 +31,15 @@ export async function POST(
     });
 
     if (user && user.emailVerified) {
-      return new Response(JSON.stringify('User e-mail already verified.'), {
-        status: 409,
-      });
+      return new Response(
+        JSON.stringify({
+          message: 'User already verified',
+          alreadyVerified: true,
+        }),
+        {
+          status: 200,
+        },
+      );
     }
 
     const validationEntry = await prisma.emailValidationToken.findFirst({
@@ -66,12 +72,19 @@ export async function POST(
       });
 
       if (updatedUser && validatedEntry) {
-        return new Response(JSON.stringify('User E-mail address verified.'));
+        return new Response(
+          JSON.stringify({
+            message: 'User e-mail verified',
+          }),
+          {
+            status: 200,
+          },
+        );
       }
     } else {
       return new Response(
         JSON.stringify({
-          error: 'Invalid or Expired Token',
+          message: 'Invalid or Expired Token',
         }),
         {
           status: 401,
@@ -82,7 +95,7 @@ export async function POST(
     console.error(err);
     return new Response(
       JSON.stringify({
-        error: 'Service unavailable',
+        message: 'Service unavailable',
       }),
       {
         status: 503,

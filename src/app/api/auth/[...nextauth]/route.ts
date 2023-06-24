@@ -1,9 +1,10 @@
 import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import type { NextAuthOptions } from 'next-auth';
+import { Session } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
 
-const baseUrl = process.env.NEXTAUTH_URL;
-
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       // The name to display on the sign in form (e.g. "Sign in with...")
@@ -13,7 +14,7 @@ const handler = NextAuth({
       // e.g. domain, username, password, 2FA token, etc.
       // You can pass any HTML attribute to the <input> tag through the object.
       credentials: {
-        username: { label: 'Username', type: 'text', placeholder: 'jsmith' },
+        username: { label: 'Username', type: 'text', placeholder: 'email' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials, req) {
@@ -45,16 +46,32 @@ const handler = NextAuth({
   pages: {
     signIn: '/login',
     newUser: '/signup',
-  } /*,
+  },
   callbacks: {
+    /*
     async jwt({ token, user }) {
       return { ...token, ...user };
-    } ,
+    } ,*/
     async session({ session, token }) {
-      session.user = token as any;
-      return session;
+      /*
+      if (session?.user) {
+        session.user.id = token.sub;
+      }*/
+      //session.user = token as any;
+      //return session;
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.sub,
+        },
+      };
     },
-  }*/,
-});
+  },
+};
+
+const baseUrl = process.env.NEXTAUTH_URL;
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
