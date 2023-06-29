@@ -36,6 +36,12 @@ export async function middleware(request: NextRequest) {
       url.searchParams.set('callbackUrl', encodeURI(request.url));
       return NextResponse.redirect(url);
     }
+
+    if (!token.emailVerified) {
+      console.log(token.emailVerified);
+      const url = new URL('sendverification', process.env.NEXTAUTH_URL || '');
+      return NextResponse.redirect(url);
+    }
   }
 
   //IF USER HAS SESSION PREVENT LOADING LOGIN PAGE

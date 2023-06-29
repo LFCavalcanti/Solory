@@ -48,11 +48,13 @@ export const authOptions: NextAuthOptions = {
     newUser: '/signup',
   },
   callbacks: {
-    /*
-    async jwt({ token, user }) {
-      return { ...token, ...user };
-    } ,*/
-    async session({ session, token }) {
+    async jwt({ token, user, account, profile }) {
+      if (user) {
+        token.emailVerified = user.emailVerified;
+      }
+      return token;
+    },
+    async session({ session, user, token }) {
       /*
       if (session?.user) {
         session.user.id = token.sub;
