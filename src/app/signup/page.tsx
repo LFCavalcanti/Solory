@@ -10,27 +10,18 @@ import {
   InputGroup,
   InputRightElement,
   Box,
-  Alert,
-  AlertIcon,
-  Slide,
-  Modal,
-  ModalContent,
-  ModalOverlay,
-  Spinner,
 } from '@chakra-ui/react';
 import { Image } from '@chakra-ui/next-js';
-import {
-  UnlockIcon,
-  LockIcon,
-  ArrowForwardIcon,
-  CloseIcon,
-} from '@chakra-ui/icons';
+import { UnlockIcon, LockIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { newUserValidate, tNewUser } from '@/types/newUser';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import FlexGradient from '@/components/common/FlexGradient';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import TopErrorSlider from '@/components/common/TopErrorSlider';
 
 export default function IndexPage() {
   const { push } = useRouter();
@@ -88,62 +79,13 @@ export default function IndexPage() {
 
   return (
     <>
-      <Modal
-        isCentered
-        size="full"
-        isOpen={isProcessing}
-        onClose={() => null}
-        motionPreset="slideInBottom"
-      >
-        <ModalOverlay />
-        <ModalContent margin={0} rounded="none" bg="whiteAlpha.50">
-          <Flex
-            height="100vh"
-            alignItems="center"
-            justifyContent="center"
-            flexDirection="column"
-          >
-            <Spinner
-              thickness="4px"
-              speed="1s"
-              emptyColor="gray.200"
-              color="contrast.500"
-              size="xl"
-            />
-          </Flex>
-        </ModalContent>
-      </Modal>
-      <Slide direction="top" in={isSignError} style={{ zIndex: 10 }}>
-        <Alert
-          status="error"
-          marginLeft="auto"
-          marginRight="auto"
-          marginTop="10"
-          maxWidth={350}
-          paddingLeft={10}
-          boxShadow="xl"
-        >
-          <AlertIcon />
-          {errorMessage}
-          <IconButton
-            padding={0}
-            aria-label="Fechar alerta"
-            h="90%"
-            ml={2}
-            size="md"
-            colorScheme="error"
-            icon={<CloseIcon color="red.300" />}
-            onClick={() => setIsSignError(false)}
-          />
-        </Alert>
-      </Slide>
-      <Flex
-        height="100vh"
-        alignItems="center"
-        justifyContent="center"
-        flexDirection="column"
-        bgGradient="linear-gradient(to right bottom, #066d87, #087895, #0a84a3, #0d8fb1, #0f9bbf, #00a6c2, #00b1c3, #00bcc2, #13c6a7, #5bcb80, #97cc52, #d4c528);"
-      >
+      <LoadingSpinner showSpinner={isProcessing} />
+      <TopErrorSlider
+        showError={isSignError}
+        errorMessage={errorMessage}
+        onClickCallBack={() => setIsSignError(false)}
+      />
+      <FlexGradient>
         <Flex
           borderBottom="10px solid"
           borderColor="contrast.500"
@@ -275,7 +217,7 @@ export default function IndexPage() {
             </form>
           </Box>
         </Flex>
-      </Flex>
+      </FlexGradient>
     </>
   );
 }

@@ -9,9 +9,6 @@ import {
   InputGroup,
   InputRightElement,
   IconButton,
-  Alert,
-  AlertIcon,
-  Slide,
 } from '@chakra-ui/react';
 import { Image } from '@chakra-ui/next-js';
 import {
@@ -19,12 +16,13 @@ import {
   UnlockIcon,
   NotAllowedIcon,
   ArrowForwardIcon,
-  CloseIcon,
 } from '@chakra-ui/icons';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
+import FlexGradient from '@/components/common/FlexGradient';
+import TopErrorSlider from '@/components/common/TopErrorSlider';
 
 export default function LoginPage() {
   const callbackUrl = '/internal/dashboard';
@@ -58,7 +56,7 @@ export default function LoginPage() {
       password,
       redirect: false,
     });
-    if (result?.status !== 200) {
+    if (result?.status !== 200 || result?.error) {
       setInvalidCredentials(true);
       return;
     }
@@ -67,37 +65,12 @@ export default function LoginPage() {
 
   return (
     <>
-      <Slide direction="top" in={invalidCredentials} style={{ zIndex: 10 }}>
-        <Alert
-          status="error"
-          marginLeft="auto"
-          marginRight="auto"
-          marginTop="10"
-          maxWidth={350}
-          paddingLeft={10}
-          boxShadow="xl"
-        >
-          <AlertIcon />
-          Usuário ou Senha Inválidos
-          <IconButton
-            padding={0}
-            aria-label="Fechar alerta"
-            h="90%"
-            ml={2}
-            size="md"
-            colorScheme="error"
-            icon={<CloseIcon color="red.300" />}
-            onClick={() => setInvalidCredentials(false)}
-          />
-        </Alert>
-      </Slide>
-      <Flex
-        height="100vh"
-        alignItems="center"
-        justifyContent="center"
-        flexDirection="column"
-        bgGradient="linear-gradient(to right bottom, #066d87, #087895, #0a84a3, #0d8fb1, #0f9bbf, #00a6c2, #00b1c3, #00bcc2, #13c6a7, #5bcb80, #97cc52, #d4c528);"
-      >
+      <TopErrorSlider
+        showError={invalidCredentials}
+        errorMessage={'Usuário ou Senha Inválidos'}
+        onClickCallBack={() => () => setInvalidCredentials(false)}
+      />
+      <FlexGradient>
         <Flex
           borderBottom="10px solid"
           borderColor="contrast.500"
@@ -173,7 +146,7 @@ export default function LoginPage() {
             </form>
           </Flex>
         </Flex>
-      </Flex>
+      </FlexGradient>
     </>
   );
 }
