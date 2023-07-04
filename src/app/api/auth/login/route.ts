@@ -30,14 +30,14 @@ export async function POST(request: Request) {
         accessToken,
       };
       return new Response(JSON.stringify(result));
+    } else {
+      return new Response(JSON.stringify('Credentials are invalid'), {
+        status: 401,
+      });
     }
   } catch (err) {
     return new Response(JSON.stringify('Service unavailable'), {
       status: 503,
     });
   }
-
-  return new Response(JSON.stringify('Credentials are invalid'), {
-    status: 401,
-  });
 }
