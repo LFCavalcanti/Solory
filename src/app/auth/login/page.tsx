@@ -9,6 +9,7 @@ import {
   InputGroup,
   InputRightElement,
   IconButton,
+  Spacer,
 } from '@chakra-ui/react';
 import { Image } from '@chakra-ui/next-js';
 import {
@@ -16,6 +17,7 @@ import {
   UnlockIcon,
   NotAllowedIcon,
   ArrowForwardIcon,
+  ArrowBackIcon,
 } from '@chakra-ui/icons';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
@@ -25,7 +27,7 @@ import FlexGradient from '@/components/common/FlexGradient';
 import TopErrorSlider from '@/components/common/TopErrorSlider';
 
 export default function LoginPage() {
-  const callbackUrl = '/internal/dashboard';
+  const callbackUrl = '/client/dashboard';
   const validadeEmail = z.string().email();
   const { push } = useRouter();
   const [username, setUserName] = useState('');
@@ -139,10 +141,22 @@ export default function LoginPage() {
                   </InputRightElement>
                 </InputGroup>
               </FormControl>
-              <Button mt={8} type="submit" variant="contrast">
-                ENTRAR
-                <ArrowForwardIcon ml={2} />
-              </Button>
+              <Flex>
+                <Button
+                  mt={8}
+                  mr={4}
+                  variant="secondary"
+                  onClick={() => push('/')}
+                >
+                  <ArrowBackIcon mr={1} />
+                  Voltar
+                </Button>
+                <Spacer />
+                <Button mt={8} type="submit" variant="contrast">
+                  ENTRAR
+                  <ArrowForwardIcon ml={2} />
+                </Button>
+              </Flex>
             </form>
           </Flex>
         </Flex>

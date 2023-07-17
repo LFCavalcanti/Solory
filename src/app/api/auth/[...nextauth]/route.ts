@@ -44,8 +44,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/login',
-    newUser: '/signup',
+    signIn: '/auth/login',
+    newUser: '/auth/signup',
   },
   callbacks: {
     async jwt({ token, user, account, profile }) {

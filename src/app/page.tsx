@@ -30,7 +30,7 @@ export default function IndexPage() {
         <Button
           variant="secondaryOutline"
           margin={1}
-          onClick={() => push('/signup')}
+          onClick={() => push('/auth/signup')}
         >
           Cadastrar
         </Button>

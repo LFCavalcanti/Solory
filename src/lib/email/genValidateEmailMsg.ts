@@ -6,7 +6,7 @@ export default function genValidateEmailMsg(
   expiration: Date,
   email: string,
 ): iSendGridMessage {
-  const validationUrl = `${getNextBaseUrl()}/verifyemail?token=${token}`;
+  const validationUrl = `${getNextBaseUrl()}/auth/verifyemail?token=${token}`;
   const expDate = new Date(expiration).toLocaleString();
   const html = `
     <!doctype html>

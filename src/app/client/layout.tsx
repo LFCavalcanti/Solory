@@ -1,4 +1,5 @@
-import Header from '@/components/common/Header';
+//import Header from '@/components/common/Header';
+import NavBar from '@/components/common/NavBar';
 
 export default function InternalLayout({
   children,
@@ -7,7 +8,7 @@ export default function InternalLayout({
 }) {
   return (
     <>
-      <Header />
+      <NavBar />
       {children}
     </>
   );

@@ -86,7 +86,7 @@ export default function verifyEmail() {
             color="text.light"
             fontWeight="500"
             fontFamily="button"
-            href="/internal/dashboard"
+            href="/client/dashboard"
           >
             Ir para Dashboard
           </Link>

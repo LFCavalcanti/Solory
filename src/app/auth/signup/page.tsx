@@ -10,9 +10,14 @@ import {
   InputGroup,
   InputRightElement,
   Box,
+  Heading,
 } from '@chakra-ui/react';
-import { Image } from '@chakra-ui/next-js';
-import { UnlockIcon, LockIcon, ArrowForwardIcon } from '@chakra-ui/icons';
+import {
+  UnlockIcon,
+  LockIcon,
+  ArrowForwardIcon,
+  ArrowBackIcon,
+} from '@chakra-ui/icons';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,6 +27,7 @@ import { useRouter } from 'next/navigation';
 import FlexGradient from '@/components/common/FlexGradient';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import TopErrorSlider from '@/components/common/TopErrorSlider';
+import fetchApp from '@/lib/fetchApp';
 
 export default function IndexPage() {
   const { push } = useRouter();
@@ -40,6 +46,7 @@ export default function IndexPage() {
   const submitUser: SubmitHandler<tNewUser> = async (data) => {
     setIsProcessing(true);
 
+    /*
     const createdCredential = await fetch(
       'http://localhost:3000/api/auth/signup',
       {
@@ -49,7 +56,15 @@ export default function IndexPage() {
         },
         body: JSON.stringify(data),
       },
-    );
+    );*/
+
+    const createdCredential = await fetchApp({
+      method: 'POST',
+      baseUrl: window.location.origin,
+      endpoint: '/api/auth/signup',
+      body: JSON.stringify(data),
+      cache: 'no-store',
+    });
 
     if (createdCredential.status === 409) {
       setErrorMessage(
@@ -74,7 +89,7 @@ export default function IndexPage() {
       password: data.password,
       redirect: false,
     });
-    push('/internal/dashboard');
+    push('/client/dashboard');
   };
 
   return (
@@ -101,13 +116,26 @@ export default function IndexPage() {
             '50%', // 62em+
           ]}
         >
-          <Image
-            src="/logo_h.svg"
-            alt="Solory"
-            width={200}
-            height={42}
-            margin={4}
-          />
+          <Flex alignItems="left" justifyContent="left" width="100%">
+            <Button
+              margin={4}
+              variant="primaryOutline"
+              onClick={() => push('/')}
+            >
+              <ArrowBackIcon mr={1} />
+              Voltar
+            </Button>
+            <Heading
+              mt="auto"
+              mb="auto"
+              ml={4}
+              color="primary.500"
+              fontFamily="heading"
+              fontSize={24}
+            >
+              CADASTRAR NOVO USUÁRIO
+            </Heading>
+          </Flex>
           <Box background="primary.500" p={12} rounded={0} width="100%">
             <form onSubmit={handleSubmit(submitUser)}>
               <Flex direction="column" gap={3}>
