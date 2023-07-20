@@ -11,7 +11,8 @@ import {
   IconButton,
   Spacer,
 } from '@chakra-ui/react';
-import { Image } from '@chakra-ui/next-js';
+//import { Image } from '@chakra-ui/next-js';
+import Image from 'next/image';
 import {
   LockIcon,
   UnlockIcon,
@@ -86,7 +87,7 @@ export default function LoginPage() {
             alt="Solory"
             width={200}
             height={42}
-            margin={4}
+            style={{ margin: '32px' }}
           />
           <Flex direction="column" background="primary.500" p={12} rounded={0}>
             <form onSubmit={tryLogin}>

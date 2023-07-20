@@ -1,7 +1,8 @@
 'use client';
 import { Flex, Button, Text } from '@chakra-ui/react';
 import { signIn } from 'next-auth/react';
-import { Image } from '@chakra-ui/next-js';
+//import { Image } from '@chakra-ui/next-js';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 export default function IndexPage() {

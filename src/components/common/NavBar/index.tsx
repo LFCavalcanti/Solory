@@ -16,7 +16,8 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { Image } from '@chakra-ui/next-js';
+//import { Image } from '@chakra-ui/next-js';
+import Image from 'next/image';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import { signOut, useSession } from 'next-auth/react';
 import NavLink from '@/components/NavLink';
