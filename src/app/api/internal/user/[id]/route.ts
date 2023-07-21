@@ -4,8 +4,11 @@ import prisma from '@/lib/prisma';
 interface Params {
   id: string;
 }
-export async function GET(request: Request, params: Params) {
-  const user = await prisma.user.findFirst({
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
+  const user = await prisma.user.findFirstOrThrow({
     where: {
       id: params.id,
     },
