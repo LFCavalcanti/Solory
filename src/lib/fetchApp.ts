@@ -1,7 +1,7 @@
 import getNextBaseUrl from './getNextBaseUrl';
 
 interface Props {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   baseUrl?: string;
   endpoint: string;
   body?: any;
@@ -14,7 +14,7 @@ export default async function fetchApp({
   method = 'GET',
   baseUrl = getNextBaseUrl(),
   endpoint,
-  body = {},
+  body = null,
   Authorization,
   revalidate,
   cache,
@@ -25,7 +25,7 @@ export default async function fetchApp({
       'Content-Type': 'application/json',
       ...(Authorization && { Authorization }),
     },
-    body,
+    ...(body && { body }),
     ...(cache && { cache }),
     ...(revalidate && { next: { revalidate } }),
   });
