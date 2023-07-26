@@ -1,19 +1,19 @@
 import { CloseIcon } from '@chakra-ui/icons';
 import { Slide, Alert, AlertIcon, IconButton } from '@chakra-ui/react';
 
-export default function TopErrorSlider({
-  showError = true,
-  errorMessage,
+export default function TopSuccessSlider({
+  showAlert = true,
+  alertMessage,
   onClickCallBack,
 }: {
-  showError: boolean;
-  errorMessage: string;
+  showAlert: boolean;
+  alertMessage: string;
   onClickCallBack: (prop: any) => any;
 }) {
   return (
-    <Slide direction="top" in={showError} style={{ zIndex: 10 }}>
+    <Slide direction="top" in={showAlert} style={{ zIndex: 10 }}>
       <Alert
-        status="error"
+        status="success"
         marginLeft="auto"
         marginRight="auto"
         marginTop="10"
@@ -22,15 +22,15 @@ export default function TopErrorSlider({
         boxShadow="none"
       >
         <AlertIcon />
-        {errorMessage}
+        {alertMessage}
         <IconButton
           padding={0}
           aria-label="Fechar alerta"
           h="90%"
           ml={2}
           size="md"
-          colorScheme="error"
-          icon={<CloseIcon color="red.300" />}
+          colorScheme="success"
+          icon={<CloseIcon color="green.300" />}
           onClick={() => onClickCallBack(false)}
         />
       </Alert>
