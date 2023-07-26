@@ -24,10 +24,10 @@ import NavLink from '@/components/NavLink';
 import { useRouter } from 'next/navigation';
 
 const Links = [
-  { dest: '/internal/dashboard', label: 'Dashboard' },
-  { dest: '/internal/cadastros', label: 'Cadastros' },
-  { dest: '/internal/apontamentos', label: 'Apontamentos' },
-  { dest: '/internal/financeiro', label: 'Financeiro' },
+  { dest: '/client/dashboard', label: 'Dashboard' },
+  { dest: '/client/cadastros', label: 'Cadastros' },
+  { dest: '/client/apontamentos', label: 'Apontamentos' },
+  { dest: '/client/financeiro', label: 'Financeiro' },
 ];
 
 export default function NavBar() {

@@ -16,8 +16,6 @@ export async function middleware(request: NextRequest) {
       }));
       */
 
-    console.log(request);
-
     const verifiedToken = await getToken({
       req: request,
     });
@@ -48,7 +46,6 @@ export async function middleware(request: NextRequest) {
     }
 
     if (!token.emailVerified) {
-      console.log(token.emailVerified);
       const url = new URL(
         'auth/sendverification',
         process.env.NEXTAUTH_URL || '',

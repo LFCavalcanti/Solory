@@ -92,7 +92,9 @@ export default function LoginPage() {
           <Flex direction="column" background="primary.500" p={12} rounded={0}>
             <form onSubmit={tryLogin}>
               <FormControl isInvalid={invalidEmail}>
-                <FormLabel color="text.light">Email</FormLabel>
+                <FormLabel color="text.light" id="email-label">
+                  Email
+                </FormLabel>
                 <Input
                   value={username}
                   onChange={(event) => setUserName(event.currentTarget.value)}
@@ -111,7 +113,9 @@ export default function LoginPage() {
                 </FormErrorMessage>
               </FormControl>
               <FormControl mt={4}>
-                <FormLabel color="text.light">Senha</FormLabel>
+                <FormLabel color="text.light" id="password-label">
+                  Senha
+                </FormLabel>
                 <InputGroup size="md">
                   <Input
                     value={password}
