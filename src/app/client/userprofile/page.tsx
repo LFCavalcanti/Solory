@@ -36,7 +36,6 @@ export default function UserProfile() {
   const { push } = useRouter();
   const [alterPassword, setAlterPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  // const [userProfile, setUserProfile] = useState<tUserProfile | null>();
   const [isError, setIsError] = useState(false);
   const [isProcessing, setIsProcessing] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -68,7 +67,7 @@ export default function UserProfile() {
       body: JSON.stringify(data),
       cache: 'no-store',
     });
-    //SE ERRO, MOSTRA ERRO E RETORNA
+
     if (!updatedData || updatedData.status !== 200) {
       setErrorMessage('Erro ao atualizar dados');
       setIsError(true);
@@ -80,7 +79,7 @@ export default function UserProfile() {
     if (updatedData.body.changedEmail || updatedData.body.changedPassword) {
       setAlertTitle('Aviso de redirecionamento...');
       setAlertMessage(
-        'Você alterou seu e-mail ou sua senha, por isso precisará e efetuar login novamente e/ou revalidar seu e-mail.',
+        'Você alterou seu e-mail ou sua senha, por isso precisará e efetuar login novamente e/ou revalidar seu e-mail. Redirecionando em 5 segundos...',
       );
       setIsAlertOpen(true);
       setTimeout(() => signOut(), 5000);
@@ -90,17 +89,6 @@ export default function UserProfile() {
     setSuccessMessage('Dados alterados com sucesso');
     setSuccessAlert(true);
   };
-  /*
-  const getUserProfile = async () => {
-    const userData = await fetchApp({
-      baseUrl: window.location.origin,
-      endpoint: `/api/internal/user/${session?.user.id}`,
-    });
-    if (userData && userData.status === 200) {
-      return userData.body;
-    }
-    return null;
-  };*/
 
   useEffect(() => {
     if (status === 'authenticated') {

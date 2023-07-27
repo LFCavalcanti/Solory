@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { CloseIcon } from '@chakra-ui/icons';
 import { useSearchParams, useRouter } from 'next/navigation';
 import FlexGradient from '@/components/common/FlexGradient';
+import { signOut } from 'next-auth/react';
 
 interface iValidationReturn {
   status: number;
@@ -44,6 +45,11 @@ export default function verifyEmail() {
     if (token) {
       activateUser().then((data) => {
         setActivationCall(data);
+        if (data.status == 200) {
+          setTimeout(() => {
+            signOut({ callbackUrl: '/auth/login' });
+          }, 5000);
+        }
       });
     }
   }, [token]);
@@ -80,16 +86,9 @@ export default function verifyEmail() {
               ? 'SEU ENDEREÇO DE E-MAIL JÁ FOI VALIDADO ANTERIORMENTE'
               : 'SEU ENDEREÇO DE E-MAIL FOI VALIDADO'}
           </Heading>
-          <Link
-            padding="2"
-            bg="primary.500"
-            color="text.light"
-            fontWeight="500"
-            fontFamily="button"
-            href="/client/dashboard"
-          >
-            Ir para Dashboard
-          </Link>
+          <Text>
+            VOCÊ SERÁ REDIRECIONADO(A) PARA A PÁGINA DE LOGIN EM 5 SEGUNDOS...
+          </Text>
         </Flex>
       </FlexGradient>
     );

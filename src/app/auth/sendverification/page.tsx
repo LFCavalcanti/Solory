@@ -3,7 +3,7 @@ import fetchApp from '@/lib/fetchApp';
 import { Button, Flex, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
 import { Image, Link } from '@chakra-ui/next-js';
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { CloseIcon } from '@chakra-ui/icons';
 import { useRouter } from 'next/navigation';
 import FlexGradient from '@/components/common/FlexGradient';
@@ -41,10 +41,18 @@ export default function sendVerification() {
   };
 
   useEffect(() => {
-    if (status !== 'loading') {
+    if (status === 'authenticated') {
       checkValidation().then((data) => {
         setValidationCall(data);
+        if (data.status === 409 && data.body.alreadyVerified) {
+          setTimeout(() => {
+            signOut({ callbackUrl: '/auth/login' });
+          }, 5000);
+        }
       });
+    }
+    if (status !== 'unauthenticated') {
+      router.push('/auth/login');
     }
   }, [status]);
 
@@ -146,16 +154,9 @@ export default function sendVerification() {
           <Heading color="text.standard" fontFamily="heading" fontSize={18}>
             SEU ENDEREÇO DE E-MAIL JÁ FOI VALIDADO
           </Heading>
-          <Link
-            padding="2"
-            bg="primary.500"
-            color="text.light"
-            fontWeight="500"
-            fontFamily="button"
-            href="/client/dashboard"
-          >
-            Ir para Dashboard
-          </Link>
+          <Text>
+            VOCÊ SERÁ REDIRECIONADO(A) PARA EFETUAR LOGIN EM 5 SEGUNDOS...
+          </Text>
         </Flex>
       </FlexGradient>
     );
