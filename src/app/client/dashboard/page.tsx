@@ -1,7 +1,9 @@
+import FlexContent from '@/components/common/FlexContent';
+
 export default function Dashboard() {
   return (
-    <div>
+    <FlexContent>
       <p>Página Protegida</p>
-    </div>
+    </FlexContent>
   );
 }

@@ -31,6 +31,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import TopErrorSlider from '@/components/common/TopErrorSlider';
 import TimedRedirectAlert from '@/components/common/TimedRedirectAlert';
 import TopSuccessSlider from '@/components/common/TopSuccessSlider';
+import FlexContent from '@/components/common/FlexContent';
 
 export default function UserProfile() {
   const { push } = useRouter();
@@ -107,7 +108,7 @@ export default function UserProfile() {
   }, [status]);
 
   return (
-    <>
+    <Box width="100%" height="100%">
       <LoadingSpinner showSpinner={isProcessing} />
       <TimedRedirectAlert
         isAlertOpen={isAlertOpen}
@@ -125,7 +126,7 @@ export default function UserProfile() {
         errorMessage={errorMessage}
         onClickCallBack={() => setIsError(false)}
       />
-      <FlexGradient>
+      <FlexContent>
         <Flex
           borderBottom="10px solid"
           borderColor="contrast.500"
@@ -325,7 +326,7 @@ export default function UserProfile() {
             </form>
           </Box>
         </Flex>
-      </FlexGradient>
-    </>
+      </FlexContent>
+    </Box>
   );
 }
