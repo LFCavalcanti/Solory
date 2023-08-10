@@ -46,6 +46,8 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  companyGroups UserToCompanyGroup[]
+  companies     UserToCompany[]
   emailValidationTokens emailValidationToken[]
 }
 
@@ -64,8 +66,103 @@ model emailValidationToken {
   expiresAt   DateTime
   ActivatedAt DateTime?
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-
-
+  userId      String
   @@unique([identifier, token])
+}
+
+model CompanyGroup {
+  id              String @id @default(cuid())
+  isActive     Boolean @default(true)
+  name            String
+  description     String
+  shareSuppliers  Boolean @default(true) @db.Boolean
+  shareClients    Boolean @default(true) @db.Boolean
+  shareProducts   Boolean @default(true) @db.Boolean
+  shareKpi        Boolean @default(true) @db.Boolean
+  companies       Company[]
+  users           UserToCompanyGroup[]
+}
+
+model UserToCompanyGroup {
+  id             String @id @default(cuid())
+  active         Boolean @default(true)
+  createdAt      DateTime
+  expiredAt      DateTime?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  companyGroup   CompanyGroup     @relation(fields: [companyGroupId], references: [id], onDelete: Cascade)
+  companyGroupId String
+  @@unique([userId, companyGroupId])
+}
+
+model Company {
+  id           String @id @default(cuid())
+  isActive     Boolean @default(true)
+  aliasName    String
+  fullName     String
+  cnpj         String @db.VarChar(14)
+  logo         String?
+  mainCnae     String @db.VarChar(7)
+  mainIssCode  String? @db.VarChar(4)
+  isMei        Boolean @default(false)
+  isSimplesNac Boolean @default(false)
+  phone        String
+  companyGroup         CompanyGroup     @relation(fields: [companyGroupId], references: [id], onDelete: Cascade)
+  companyGroupId String
+  users        UserToCompany[]
+  adresses     CompanyAddress[]
+  companyCnaeIss CompanyCnaeIss[]
+  @@unique([cnpj, companyGroupId])
+}
+
+model UserToCompany {
+  id        String  @id @default(cuid())
+  active    Boolean @default(true)
+  createdAt DateTime
+  expiredAt DateTime?
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  @@unique([userId, companyId])
+}
+
+model CompanyAddress {
+  id  String @id @default(cuid())
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  street String
+  lotNumber String
+  complement String
+  locale String
+  cep String @db.VarChar(8)
+  state String
+  cities   cities @relation(fields: [cityCode], references: [code], onDelete: Cascade)
+  cityCode String
+  information String @db.Text
+}
+
+model CompanyCnaeIss {
+  id  String @id @default(cuid())
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  cnae   Cnae @relation(fields: [cnaeCode], references: [code], onDelete: Cascade)
+  cnaeCode String @db.VarChar(7)
+  issCode String? @db.VarChar(4)
+}
+
+model Cnae {
+  code String @id @db.VarChar(7)
+  descricao String @db.Text
+  annex String
+  rFactor Boolean
+  aliquot Float
+  companyCnaeIss CompanyCnaeIss[]
+}
+
+model cities {
+  code String @id
+  name String
+  state String
+  companyAdress CompanyAddress[]
 }
