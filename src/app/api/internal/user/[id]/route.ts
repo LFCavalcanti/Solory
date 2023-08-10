@@ -1,6 +1,6 @@
 // import { verifyJwt } from '@/lib/jwt';
 import prisma from '@/lib/prisma';
-import { tUserProfile } from '@/types/User';
+import { tUserProfile } from '@/types/User/tUser';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 

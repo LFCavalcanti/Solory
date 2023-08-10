@@ -23,7 +23,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { tUserProfile, userProfileValidate } from '@/types/User';
+import { tUserProfile, userProfileValidate } from '@/types/User/tUser';
 import { useEffect, useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import fetchApp from '@/lib/fetchApp';

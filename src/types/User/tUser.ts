@@ -27,3 +27,11 @@ export const userProfileValidate = z
   });
 
 export type tUserProfile = z.infer<typeof userProfileValidate>;
+
+export type tUserProfileData = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  emailVerified: Date | null;
+  image: string | null;
+};
