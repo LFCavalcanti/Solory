@@ -4,9 +4,23 @@ import {
   type tNewCompanyGroup,
 } from '@/types/CompanyGroup/tCompanyGroup';
 import { tUserProfileData } from '@/types/User/tUser';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth/next';
 
-export async function POST(request: Request) {
+export async function POST(request: Request, response: Response) {
   const body = await request.json();
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user.id) {
+    return new Response(
+      JSON.stringify({
+        message: 'Invalid Session',
+      }),
+      {
+        status: 401,
+      },
+    );
+  }
 
   //--> CHECAR PAYLOAD SE ESTA COM OS DADOS CORRETOS
   const validatedSchema = newCompanyGroupValidate.safeParse(body);
@@ -22,43 +36,21 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!body.userId) {
-    return new Response(
-      JSON.stringify({
-        message: 'Must provide user ID',
-      }),
-      {
-        status: 400,
-      },
-    );
-  }
-
-  let userData: null | tUserProfileData = null;
-
-  try {
-    userData = await prisma.user.findFirstOrThrow({
-      where: {
-        id: body.userId,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    return new Response(
-      JSON.stringify({
-        message: 'Provided User ID not found',
-      }),
-      {
-        status: 400,
-      },
-    );
-  }
-
   //--> CRIAR GRUPO DE EMPRESA
   let companyGroup: any = null;
   try {
     companyGroup = await prisma.companyGroup.create({
       data: {
         ...validatedSchema.data,
+        createdAt: new Date().toISOString(),
+        users: {
+          create: [
+            {
+              createdAt: new Date().toISOString(),
+              userId: session.user.id,
+            },
+          ],
+        },
       },
     });
   } catch (error) {
@@ -72,31 +64,6 @@ export async function POST(request: Request) {
       },
     );
   }
-
-  console.log(companyGroup);
-
-  //--> CRIAR PERMISSÃO PARA O USUÁRIO NO GRUPO DA EMPRESA
-  let userToCompanyGroup: any = null;
-  try {
-    userToCompanyGroup = await prisma.userToCompanyGroup.create({
-      data: {
-        createdAt: new Date().toISOString(),
-        userId: userData.id,
-        companyGroupId: companyGroup.id,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    return new Response(
-      JSON.stringify({
-        message: 'Error creating the Company Group Permission',
-      }),
-      {
-        status: 500,
-      },
-    );
-  }
-  //validatedSchema.data;
 
   //--> RETORNAR ID DO GRUPO DE EMPRESA
   return new Response(JSON.stringify(companyGroup));
