@@ -35,7 +35,7 @@ export async function GET(
         message: 'Error retrieving Company Group or you do not have permission',
       }),
       {
-        status: 409,
+        status: 404,
       },
     );
   }
@@ -91,7 +91,7 @@ export async function PUT(
         message: 'Error retrieving Company Group or you do not have permission',
       }),
       {
-        status: 401,
+        status: 403,
       },
     );
   }

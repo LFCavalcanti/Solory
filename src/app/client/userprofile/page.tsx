@@ -64,7 +64,7 @@ export default function UserProfile() {
     const updatedData = await fetchApp({
       method: 'PUT',
       baseUrl: window.location.origin,
-      endpoint: `/api/internal/user/${session?.user.id}`,
+      endpoint: `/api/internal/users/${session?.user.id}`,
       body: JSON.stringify(data),
       cache: 'no-store',
     });

@@ -1,11 +1,8 @@
 import prisma from '@/lib/prisma';
-import {
-  newCompanyGroupValidate,
-  type tNewCompanyGroup,
-} from '@/types/CompanyGroup/tCompanyGroup';
-import { tUserProfileData } from '@/types/User/tUser';
+import { newCompanyGroupValidate } from '@/types/CompanyGroup/tCompanyGroup';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
+import { NextRequest } from 'next/server';
 
 export async function POST(request: Request, response: Response) {
   const body = await request.json();
@@ -67,4 +64,46 @@ export async function POST(request: Request, response: Response) {
 
   //--> RETORNAR ID DO GRUPO DE EMPRESA
   return new Response(JSON.stringify(companyGroup));
+}
+
+export async function GET(request: NextRequest) {
+  const onlyActive = request.nextUrl.searchParams.get('onlyActive');
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user.id) {
+    return new Response(
+      JSON.stringify({
+        message: 'Invalid Session',
+      }),
+      {
+        status: 401,
+      },
+    );
+  }
+
+  const companyGroups = await prisma.companyGroup.findMany({
+    where: {
+      ...(onlyActive === 'true' && { isActive: true }),
+      users: {
+        every: {
+          userId: session.user.id,
+        },
+      },
+    },
+  });
+
+  if (!companyGroups) {
+    return new Response(
+      JSON.stringify({
+        message:
+          'Error retrieving a list of Company Groups or you do not have permission to any',
+      }),
+      {
+        status: 403,
+      },
+    );
+  }
+
+  return new Response(JSON.stringify(companyGroups), {
+    status: 201,
+  });
 }
