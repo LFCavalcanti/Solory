@@ -68,6 +68,7 @@ export async function POST(request: Request, response: Response) {
 
 export async function GET(request: NextRequest) {
   const onlyActive = request.nextUrl.searchParams.get('onlyActive');
+  const orderBy = request.nextUrl.searchParams.get('orderBy');
   const session = await getServerSession(authOptions);
   if (!session || !session.user.id) {
     return new Response(
@@ -89,6 +90,16 @@ export async function GET(request: NextRequest) {
         },
       },
     },
+    ...(orderBy === 'id' && {
+      orderBy: {
+        id: 'asc',
+      },
+    }),
+    ...(orderBy === 'name' && {
+      orderBy: {
+        name: 'asc',
+      },
+    }),
   });
 
   if (!companyGroups) {
