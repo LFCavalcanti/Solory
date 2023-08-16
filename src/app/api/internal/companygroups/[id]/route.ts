@@ -153,10 +153,14 @@ export async function PUT(
   const updatedCompanyGroup = await prisma.companyGroup.update({
     where: { id: params.id },
     data: {
-      ...(validatedSchema.data.isActive == false && {
-        isActive: validatedSchema.data.isActive,
-        disabledAt: currentDate,
-      }),
+      ...(validatedSchema.data.isActive == false &&
+        companyGroup.isActive == true && {
+          disabledAt: currentDate,
+        }),
+      ...(validatedSchema.data.isActive == true &&
+        companyGroup.isActive == false && {
+          disabledAt: null,
+        }),
       ...validatedSchema.data,
     },
   });
