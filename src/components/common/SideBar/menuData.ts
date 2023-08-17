@@ -14,12 +14,12 @@ export const companyMenu: iMenuItem[] = [
   {
     key: 'companyGroups',
     label: 'Grupo de Empresas',
-    destination: '/client/companygroup',
+    destination: '/client/companygroups',
   },
   {
     key: 'companies',
     label: 'Empresas',
-    destination: '/client/company',
+    destination: '/client/companies',
   },
   {
     key: 'produtos',

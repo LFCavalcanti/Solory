@@ -1,21 +1,12 @@
 //export { default } from 'next-auth/middleware';
 import { getToken } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
-import verifyAccessToken from './lib/tokens/verifyAccessToken';
+
+//export { default } from 'next-auth/middleware';
 
 export async function middleware(request: NextRequest) {
   //API PROTECTION
   if (request.nextUrl.pathname.startsWith('/api/internal')) {
-    /* KEEPING REFERENCE FOR FUTURE HANDLING OF
-    const accessToken = request.headers.get('authorization');
-    console.log(accessToken);
-    const verifiedToken =
-      accessToken &&
-      (await verifyAccessToken(accessToken).catch((error) => {
-        console.error(error);
-      }));
-      */
-
     const verifiedToken = await getToken({
       req: request,
     });
@@ -69,4 +60,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: ['/client/:path*', '/api/internal/:path*', '/auth/login'],
+  //matcher: ['/client/:path*', '/api/internal/:path*'],
 };

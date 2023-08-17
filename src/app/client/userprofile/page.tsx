@@ -75,8 +75,6 @@ export default function UserProfile() {
       return;
     }
 
-    console.log(updatedData);
-
     if (updatedData.body.changedEmail || updatedData.body.changedPassword) {
       setAlertTitle('Aviso de redirecionamento...');
       setAlertMessage(

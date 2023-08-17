@@ -3,12 +3,13 @@ import prisma from '@/lib/prisma';
 import { tUserProfile } from '@/types/User/tUser';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface Params {
   id: string;
 }
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   const user = await prisma.user.findFirstOrThrow({
@@ -19,7 +20,7 @@ export async function GET(
 
   if (user) {
     const { password, ...userWithoutPass } = user;
-    return new Response(JSON.stringify(userWithoutPass));
+    return NextResponse.json(userWithoutPass);
   }
 
   return new Response(JSON.stringify(null));
