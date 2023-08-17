@@ -8,6 +8,7 @@ interface Props {
   Authorization?: string;
   revalidate?: number;
   cache?: 'no-store';
+  authCookie?: string | null;
 }
 
 export default async function fetchApp({
@@ -18,12 +19,15 @@ export default async function fetchApp({
   Authorization,
   revalidate,
   cache,
+  authCookie = undefined,
 }: Props) {
   const response = await fetch(baseUrl + endpoint, {
     method,
     headers: {
       'Content-Type': 'application/json',
+      Accept: 'application/json',
       ...(Authorization && { Authorization }),
+      ...(authCookie && { Cookie: authCookie }),
     },
     ...(body && { body }),
     ...(cache && { cache }),

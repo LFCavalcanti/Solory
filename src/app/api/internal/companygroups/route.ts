@@ -2,7 +2,7 @@ import prisma from '@/lib/prisma';
 import { newCompanyGroupValidate } from '@/types/CompanyGroup/tCompanyGroup';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: Request, response: Response) {
   const body = await request.json();
@@ -70,6 +70,7 @@ export async function GET(request: NextRequest) {
   const onlyActive = request.nextUrl.searchParams.get('onlyActive');
   const orderBy = request.nextUrl.searchParams.get('orderBy');
   const session = await getServerSession(authOptions);
+
   if (!session || !session.user.id) {
     return new Response(
       JSON.stringify({
@@ -114,7 +115,5 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return new Response(JSON.stringify(companyGroups), {
-    status: 201,
-  });
+  return NextResponse.json(companyGroups);
 }
