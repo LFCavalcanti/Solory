@@ -14,7 +14,7 @@ export default function NavLink({ dest = '#', children }: Props) {
       _hover={{
         textDecoration: 'none',
         color: 'text.light',
-        bg: useColorModeValue('primary.500', 'gray.700'),
+        bg: useColorModeValue('brandPrimary.500', 'gray.700'),
       }}
       href={dest}
     >

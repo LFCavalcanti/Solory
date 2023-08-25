@@ -117,14 +117,14 @@ export default function IndexPage() {
               mt="auto"
               mb="auto"
               ml={4}
-              color="primary.500"
+              color="brandPrimary.500"
               fontFamily="heading"
               fontSize={24}
             >
               CADASTRAR NOVO USUÁRIO
             </Heading>
           </Flex>
-          <Box background="primary.500" p={12} rounded={0} width="100%">
+          <Box background="brandPrimary.500" p={12} rounded={0} width="100%">
             <form onSubmit={handleSubmit(submitUser)}>
               <Flex direction="column" gap={3}>
                 <FormControl isInvalid={errors.name !== undefined}>
@@ -178,9 +178,9 @@ export default function IndexPage() {
                         colorScheme="backgroundLight"
                         icon={
                           showPassword ? (
-                            <UnlockIcon color="primary.500" />
+                            <UnlockIcon color="brandPrimary.500" />
                           ) : (
-                            <LockIcon color="primary.500" />
+                            <LockIcon color="brandPrimary.500" />
                           )
                         }
                         onClick={() => setShowPassword(!showPassword)}
@@ -212,9 +212,9 @@ export default function IndexPage() {
                         colorScheme="backgroundLight"
                         icon={
                           showPassword ? (
-                            <UnlockIcon color="primary.500" />
+                            <UnlockIcon color="brandPrimary.500" />
                           ) : (
-                            <LockIcon color="primary.500" />
+                            <LockIcon color="brandPrimary.500" />
                           )
                         }
                         onClick={() => setShowPassword(!showPassword)}

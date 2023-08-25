@@ -46,7 +46,7 @@ export default function SideBar() {
       alignItems="center"
       justifyContent="top"
       flexDirection="column"
-      background="primary.500"
+      background="brandPrimary.500"
       pt={2}
     >
       <Box bg={useColorModeValue('gray.100', 'gray.900')} padding={2} h={14}>
@@ -126,7 +126,7 @@ export default function SideBar() {
             size={'md'}
             name={session?.user?.name || undefined}
             src={session?.user?.image || undefined}
-            background="secondary.500"
+            background="brandSecondary.500"
           />
         </MenuButton>
         <MenuList>

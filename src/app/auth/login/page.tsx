@@ -89,7 +89,12 @@ export default function LoginPage() {
             height={42}
             style={{ margin: '32px' }}
           />
-          <Flex direction="column" background="primary.500" p={12} rounded={0}>
+          <Flex
+            direction="column"
+            background="brandPrimary.500"
+            p={12}
+            rounded={0}
+          >
             <form onSubmit={tryLogin}>
               <FormControl isInvalid={invalidEmail}>
                 <FormLabel color="text.light" id="email-label">
@@ -136,9 +141,9 @@ export default function LoginPage() {
                       colorScheme="backgroundLight"
                       icon={
                         showPassword ? (
-                          <UnlockIcon color="primary.500" />
+                          <UnlockIcon color="brandPrimary.500" />
                         ) : (
-                          <LockIcon color="primary.500" />
+                          <LockIcon color="brandPrimary.500" />
                         )
                       }
                       onClick={() => setShowPassword(!showPassword)}
