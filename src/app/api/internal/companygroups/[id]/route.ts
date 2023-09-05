@@ -32,7 +32,7 @@ export async function GET(
   if (!companyGroup) {
     return new Response(
       JSON.stringify({
-        message: 'Error retrieving Company Group or you do not have permission',
+        message: `### ID ${params.id} does not exist or insufficient permission`,
       }),
       {
         status: 404,
@@ -49,6 +49,7 @@ export async function PUT(
   const session = await getServerSession(authOptions);
   const body = await request.json();
   const currentDate = new Date().toISOString();
+
   if (!session || !session.user.id) {
     return new Response(
       JSON.stringify({
@@ -56,6 +57,17 @@ export async function PUT(
       }),
       {
         status: 401,
+      },
+    );
+  }
+
+  if (body.id) {
+    return new Response(
+      JSON.stringify({
+        message: 'Entity Id must not be present in payload body',
+      }),
+      {
+        status: 400,
       },
     );
   }
@@ -88,7 +100,7 @@ export async function PUT(
   if (!companyGroup) {
     return new Response(
       JSON.stringify({
-        message: 'Error retrieving Company Group or you do not have permission',
+        message: `### ID ${params.id} does not exist or insufficient permission`,
       }),
       {
         status: 403,
