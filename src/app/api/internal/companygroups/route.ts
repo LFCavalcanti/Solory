@@ -69,6 +69,7 @@ export async function POST(request: Request, response: Response) {
 export async function GET(request: NextRequest) {
   const onlyActive = request.nextUrl.searchParams.get('onlyActive');
   const orderBy = request.nextUrl.searchParams.get('orderBy');
+  const tableList = request.nextUrl.searchParams.get('tableList');
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user.id) {
@@ -91,6 +92,16 @@ export async function GET(request: NextRequest) {
         },
       },
     },
+    ...(tableList === 'true' && {
+      select: {
+        id: true,
+        isActive: true,
+        name: true,
+        description: true,
+        createdAt: true,
+        disabledAt: true,
+      },
+    }),
     ...(orderBy === 'id' && {
       orderBy: {
         id: 'asc',
