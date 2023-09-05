@@ -44,25 +44,48 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import { BiBlock } from 'react-icons/bi';
 import { FaEllipsisVertical } from 'react-icons/fa6';
 import debounce from 'lodash.debounce';
+import { useRegistryFormStore } from '@/lib/hooks/state/useRegistryFormStore';
+import RegistryModal from './RegistryModal';
+import { tBulkActionReturn } from '@/types/tBulkActionReturn';
+import LoadingSpinner from '../common/LoadingSpinner';
+import TopSuccessSlider from '../common/TopSuccessSlider';
+import TopErrorSlider from '../common/TopErrorSlider';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   registerData: object[];
   registerColumns: ColumnDef<object, any>[];
   title: string;
-  editComponent: React.FunctionComponent;
   delAction?: 'disable' | 'delete';
+  FormComponent: React.FC;
+  deleteBulkFunction: (args: any) => tBulkActionReturn;
 }
 
 export default function RegisterPage({
+  FormComponent,
   registerData,
   registerColumns,
   title,
-  editComponent,
   delAction = 'delete',
+  deleteBulkFunction,
 }: Props) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [searchInput, setSearchInput] = useState('');
   const [filtering, setFiltering] = useState('');
+  const [isOpen, openForm] = useRegistryFormStore((state) => [
+    state.isOpen,
+    state.openForm,
+  ]);
+
+  const router = useRouter();
+
+  const [isErrorSlider, setIsErrorSlider] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const [isSuccessAlert, setIsSuccessAlert] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const columns = useMemo<ColumnDef<object, any>[]>(
     () => [
@@ -94,9 +117,9 @@ export default function RegisterPage({
       },
       ...registerColumns,
       {
-        id: 'actions',
+        id: 'actionButtons',
         header: 'Ações',
-        cell: ({ row, cell, table }) => {
+        cell: ({ cell }) => {
           const cellData = cell.row.original;
           return (
             <Menu>
@@ -112,7 +135,7 @@ export default function RegisterPage({
                   fontSize="12px"
                   color="text.standard"
                   icon={<ViewIcon />}
-                  onClick={() => console.info('VIZUALIZA', cellData)}
+                  onClick={() => openForm(cellData, 'view')}
                 >
                   Visualizar
                 </MenuItem>
@@ -122,7 +145,7 @@ export default function RegisterPage({
                   fontSize="12px"
                   color="text.standard"
                   icon={<EditIcon />}
-                  onClick={() => console.info('EDITAR', cellData)}
+                  onClick={() => openForm(cellData, 'edit')}
                 >
                   Editar
                 </MenuItem>
@@ -134,7 +157,7 @@ export default function RegisterPage({
                   icon={
                     delAction === 'delete' ? <AiOutlineDelete /> : <BiBlock />
                   }
-                  onClick={() => console.info('DELETAR', cellData)}
+                  onClick={() => openForm(cellData, 'delete')}
                 >
                   {delAction === 'delete' ? 'Excluir' : 'Desativar'}
                 </MenuItem>
@@ -169,204 +192,248 @@ export default function RegisterPage({
     onGlobalFilterChange: setFiltering,
   });
 
+  const handleBulkDelete = async () => {
+    setIsProcessing(true);
+    let selectedRows = table.getSelectedRowModel().flatRows.map((row) => {
+      return row.original;
+    });
+    const deleteResult = await deleteBulkFunction(selectedRows);
+    console.log(deleteResult);
+    if (!deleteResult || (deleteResult && !deleteResult.result)) {
+      setErrorMessage(
+        !deleteResult
+          ? 'Erro ao processar requisição'
+          : `Erro ao desativar os grupos ${deleteResult.errorMessagePile}`,
+      );
+      setIsErrorSlider(true);
+      setIsProcessing(false);
+      return;
+    }
+    setSuccessMessage('Grupos selecionados desativados com sucesso');
+    setIsSuccessAlert(true);
+    setIsProcessing(false);
+    router.refresh();
+  };
+
   return (
-    <Flex
-      height="100%"
-      width="100%"
-      alignItems="center"
-      justifyContent="center"
-      flexDirection="column"
-      padding={2}
-      bg="whiteAlpha.500"
-    >
+    <>
+      <LoadingSpinner showSpinner={isProcessing} />
+      <TopSuccessSlider
+        showAlert={isSuccessAlert}
+        onClickCallBack={() => setIsSuccessAlert(false)}
+        alertMessage={successMessage}
+      />
+      <TopErrorSlider
+        showError={isErrorSlider}
+        errorMessage={errorMessage}
+        onClickCallBack={() => setIsErrorSlider(false)}
+      />
+      {isOpen && <RegistryModal FormComponent={FormComponent} />}
       <Flex
-        borderBottom="5px solid"
-        borderColor="brandPrimary.500"
-        alignItems="left"
-        justifyContent="center"
-        bg="backgroundLight"
-        flexDirection="column"
-        boxShadow="lg"
-        padding={2}
-        width="100%"
-      >
-        <Heading
-          mt="auto"
-          mb="auto"
-          ml={4}
-          color="brandPrimary.500"
-          fontFamily="heading"
-          fontSize={20}
-        >
-          {title}
-        </Heading>
-      </Flex>
-      <Flex
-        borderBottom="5px solid"
-        borderColor="contrast.500"
-        alignItems="left"
-        justifyContent="flex-start"
-        bg="whiteAlpha.600"
-        flexDirection="column"
-        boxShadow="lg"
-        padding={2}
-        width="100%"
         height="100%"
+        width="100%"
+        alignItems="center"
+        justifyContent="center"
+        flexDirection="column"
+        padding={2}
+        bg="whiteAlpha.500"
       >
         <Flex
+          borderBottom="5px solid"
+          borderColor="brandPrimary.500"
+          alignItems="left"
+          justifyContent="center"
           bg="backgroundLight"
+          flexDirection="column"
+          boxShadow="lg"
           padding={2}
           width="100%"
-          gap={2}
-          boxShadow="sm"
         >
-          <InputGroup size="md" maxWidth="40%">
-            <InputLeftElement
-              pointerEvents="none"
-              children={<Search2Icon color="gray.600" />}
-            />
-            <Input
-              type="text"
-              placeholder="Buscar..."
-              border="1px solid"
-              borderColor="brandPrimary.500"
-              borderRadius={0}
-              value={searchInput}
-              onChange={searchChange}
-            />
-            {/* <InputRightAddon p={0} border="none">
-              <Button variant="primary">Buscar</Button>
-            </InputRightAddon> */}
-          </InputGroup>
-          <Button leftIcon={<AddIcon />} variant="secondary" width={28}>
-            Incluir
-          </Button>
-          <Button
-            leftIcon={<PiExportBold size={20} />}
-            variant="secondaryOutline"
-            width={28}
-            onClick={() =>
-              console.info(
-                'table.getSelectedRowModel().flatRows',
-                table.getSelectedRowModel().flatRows,
-              )
-            }
+          <Heading
+            mt="auto"
+            mb="auto"
+            ml={4}
+            color="brandPrimary.500"
+            fontFamily="heading"
+            fontSize={20}
           >
-            Exportar
-          </Button>
-          <Button
-            leftIcon={
-              delAction === 'delete' ? (
-                <AiOutlineDelete size={18} />
-              ) : (
-                <BiBlock size={18} />
-              )
-            } //BiBlock
-            variant="delete"
-            width={28}
-          >
-            {delAction === 'delete' ? 'Excluir' : 'Desativar'}
-          </Button>
+            {title}
+          </Heading>
         </Flex>
         <Flex
-          bg="backgroundLight"
+          borderBottom="5px solid"
+          borderColor="contrast.500"
+          alignItems="left"
+          justifyContent="flex-start"
+          bg="whiteAlpha.600"
+          flexDirection="column"
+          boxShadow="lg"
           padding={2}
           width="100%"
           height="100%"
-          gap={2}
-          boxShadow="sm"
-          flexDirection="column"
         >
-          <Table size="sm" variant="registry" maxWidth="100%">
-            <Thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <Tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-                    const meta: any = header.column.columnDef.meta;
-                    return (
-                      <Th
-                        key={header.id}
-                        onClick={header.column.getToggleSortingHandler()}
-                        isNumeric={meta?.isNumeric}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+          <Flex
+            bg="backgroundLight"
+            padding={2}
+            width="100%"
+            gap={2}
+            boxShadow="sm"
+          >
+            <InputGroup size="md" maxWidth="40%">
+              <InputLeftElement
+                pointerEvents="none"
+                children={<Search2Icon color="gray.600" />}
+              />
+              <Input
+                type="text"
+                placeholder="Buscar..."
+                border="1px solid"
+                borderColor="brandPrimary.500"
+                borderRadius={0}
+                value={searchInput}
+                onChange={searchChange}
+              />
+            </InputGroup>
+            <Button
+              leftIcon={<AddIcon />}
+              variant="secondary"
+              width={28}
+              onClick={() => openForm(null, 'insert')}
+            >
+              Incluir
+            </Button>
+            <Button
+              leftIcon={<PiExportBold size={20} />}
+              variant="secondaryOutline"
+              width={28}
+              onClick={() =>
+                console.info(
+                  'table.getSelectedRowModel().flatRows',
+                  table.getSelectedRowModel().flatRows,
+                )
+              }
+            >
+              Exportar
+            </Button>
+            <Button
+              leftIcon={
+                delAction === 'delete' ? (
+                  <AiOutlineDelete size={18} />
+                ) : (
+                  <BiBlock size={18} />
+                )
+              } //BiBlock
+              onClick={() => handleBulkDelete()}
+              variant="delete"
+              width={28}
+            >
+              {delAction === 'delete' ? 'Excluir' : 'Desativar'}
+            </Button>
+          </Flex>
+          <Flex
+            bg="backgroundLight"
+            padding={2}
+            width="100%"
+            height="100%"
+            gap={2}
+            boxShadow="sm"
+            flexDirection="column"
+          >
+            <Table size="sm" variant="registry" maxWidth="100%">
+              <Thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <Tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                      const meta: any = header.column.columnDef.meta;
+                      return (
+                        <Th
+                          key={header.id}
+                          onClick={header.column.getToggleSortingHandler()}
+                          isNumeric={meta?.isNumeric}
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
 
-                        <chakra.span pl="4">
-                          {header.column.getIsSorted() ? (
-                            header.column.getIsSorted() === 'desc' ? (
-                              <TriangleDownIcon aria-label="Ordenação decrescente" />
-                            ) : (
-                              <TriangleUpIcon aria-label="Ordenação crescente" />
-                            )
-                          ) : null}
-                        </chakra.span>
-                      </Th>
-                    );
-                  })}
-                </Tr>
-              ))}
-            </Thead>
-            <Tbody>
-              {table.getRowModel().rows.map((row) => (
-                <Tr
-                  key={row.id}
-                  bg={row.getIsSelected() ? 'brandSecondary.50' : 'transparent'}
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-                    const meta: any = cell.column.columnDef.meta;
-                    const rowData: any = row.original;
-                    return (
-                      <Td
-                        key={cell.id}
-                        isNumeric={meta?.isNumeric}
-                        color={rowData.isActive ? 'text.standard' : 'gray.400'}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </Td>
-                    );
-                  })}
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-          <Flex>
-            <Button
-              variant="tableNavigation"
-              onClick={() => table.setPageIndex(0)}
-            >
-              Primeira
-            </Button>
-            <Button
-              variant="tableNavigation"
-              isDisabled={!table.getCanPreviousPage()}
-              onClick={() => table.previousPage()}
-            >
-              Anterior
-            </Button>
-            <Button
-              variant="tableNavigation"
-              isDisabled={!table.getCanNextPage()}
-              onClick={() => table.nextPage()}
-            >
-              Próxima
-            </Button>
-            <Button
-              variant="tableNavigation"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            >
-              Última
-            </Button>
+                          <chakra.span pl="4">
+                            {header.column.getIsSorted() ? (
+                              header.column.getIsSorted() === 'desc' ? (
+                                <TriangleDownIcon aria-label="Ordenação decrescente" />
+                              ) : (
+                                <TriangleUpIcon aria-label="Ordenação crescente" />
+                              )
+                            ) : null}
+                          </chakra.span>
+                        </Th>
+                      );
+                    })}
+                  </Tr>
+                ))}
+              </Thead>
+              <Tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <Tr
+                    key={row.id}
+                    bg={
+                      row.getIsSelected() ? 'brandSecondary.50' : 'transparent'
+                    }
+                  >
+                    {row.getVisibleCells().map((cell) => {
+                      // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                      const meta: any = cell.column.columnDef.meta;
+                      const rowData: any = row.original;
+                      return (
+                        <Td
+                          key={cell.id}
+                          isNumeric={meta?.isNumeric}
+                          color={
+                            rowData.isActive ? 'text.standard' : 'gray.400'
+                          }
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </Td>
+                      );
+                    })}
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+            <Flex>
+              <Button
+                variant="tableNavigation"
+                onClick={() => table.setPageIndex(0)}
+              >
+                Primeira
+              </Button>
+              <Button
+                variant="tableNavigation"
+                isDisabled={!table.getCanPreviousPage()}
+                onClick={() => table.previousPage()}
+              >
+                Anterior
+              </Button>
+              <Button
+                variant="tableNavigation"
+                isDisabled={!table.getCanNextPage()}
+                onClick={() => table.nextPage()}
+              >
+                Próxima
+              </Button>
+              <Button
+                variant="tableNavigation"
+                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              >
+                Última
+              </Button>
+            </Flex>
           </Flex>
         </Flex>
       </Flex>
-    </Flex>
+    </>
   );
 }
