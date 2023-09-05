@@ -21,7 +21,7 @@ import {
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { newUserValidate, tNewUser } from '@/types/newUser';
+import { newUserValidate, tNewUser } from '@/types/User/tNewUser';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import FlexGradient from '@/components/common/FlexGradient';
