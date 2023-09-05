@@ -6,12 +6,13 @@ import {
   companyGroupRegisterFields,
   companyGroupTableColumns,
 } from './registerFields';
-import companyGroupForm from './companyGroupForm';
+import CompanyGroupForm from './companyGroupForm';
+import disableBulkCompanyGroup from './disableBulkCompanyGroup';
 
 const getCompanyGroups = async (): Promise<tCompanyGroup[]> => {
   try {
     const companyGroups = await fetchApp({
-      endpoint: `/api/internal/companygroups?orderBy=name`,
+      endpoint: `/api/internal/companygroups?orderBy=name&tableList=true`,
       cache: 'no-store',
       authCookie: getApiAuthToken(),
     });
@@ -30,9 +31,10 @@ export default async function companygroup() {
         title="GRUPOS DE EMPRESAS"
         registerData={companyGroups}
         registerColumns={companyGroupTableColumns}
-        editComponent={companyGroupForm}
         delAction="disable"
-      />
+        FormComponent={CompanyGroupForm}
+        deleteBulkFunction={disableBulkCompanyGroup}
+      ></RegisterPage>
     </>
   );
 }

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const newCompanyGroupValidate = z.object({
-  name: z.string().max(100).trim().toUpperCase(),
-  description: z.string().trim().toUpperCase(),
+  name: z.string().nonempty().max(100).trim().toUpperCase(),
+  description: z.string().nonempty().trim().toUpperCase(),
   shareSuppliers: z
     .boolean({
       invalid_type_error: 'shareSuppliers must be a boolean',
@@ -26,8 +26,9 @@ export const newCompanyGroupValidate = z.object({
 });
 
 export const companyGroupValidate = z.object({
-  name: z.string().max(100).trim().toUpperCase(),
-  description: z.string().trim().toUpperCase(),
+  id: z.string().optional(),
+  name: z.string().nonempty().max(100).trim().toUpperCase().optional(),
+  description: z.string().nonempty().trim().toUpperCase().optional(),
   isActive: z
     .boolean({
       invalid_type_error: 'isActive must be a boolean',
@@ -55,5 +56,17 @@ export const companyGroupValidate = z.object({
     .optional(),
 });
 
+export const companyGroupTableRow = z.object({
+  id: z.string().nonempty(),
+  name: z.string().nonempty().max(100).trim().toUpperCase(),
+  description: z.string().nonempty().trim().toUpperCase(),
+  isActive: z.boolean({
+    invalid_type_error: 'isActive must be a boolean',
+  }),
+  createdAt: z.string(),
+  disabledAt: z.string().nullable(),
+});
+
 export type tNewCompanyGroup = z.infer<typeof newCompanyGroupValidate>;
 export type tCompanyGroup = z.infer<typeof companyGroupValidate>;
+export type tCompanyGroupTableRow = z.infer<typeof companyGroupTableRow>;

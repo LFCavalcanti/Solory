@@ -1,5 +1,5 @@
 'use client';
-import TableLocaleDate from '@/lib/tableLocaleDate';
+import getTableLocaleDate from '@/lib/getTableLocaleDate';
 import { ColumnDef } from '@tanstack/react-table';
 
 export const companyGroupTableColumns: ColumnDef<object, any>[] = [
@@ -19,12 +19,12 @@ export const companyGroupTableColumns: ColumnDef<object, any>[] = [
   {
     header: 'Data Criação',
     accessorKey: 'createdAt',
-    cell: (info) => TableLocaleDate(info.getValue()),
+    cell: (info) => getTableLocaleDate(info.getValue()),
   },
   {
     header: 'Data Desativação',
     accessorKey: 'disabledAt',
-    cell: (info) => TableLocaleDate(info.getValue()),
+    cell: (info) => getTableLocaleDate(info.getValue()),
   },
 ];
 export const companyGroupRegisterFields = [];
