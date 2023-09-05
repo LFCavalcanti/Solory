@@ -11,15 +11,15 @@ export const ButtonStyles = {
       color: 'text.darkMode',
       boxShadow: 'base',
       _hover: {
-        bg: 'brandPrimary.600',
+        bg: 'brandPrimary.400',
       },
       _active: {
-        bg: 'brandPrimary.400',
+        bg: 'brandPrimary.300',
       },
     },
     primaryOutline: {
       bg: 'transparent',
-      border: '1px solid',
+      border: '2px solid',
       borderColor: 'brandPrimary.500',
       color: 'brandPrimary.500',
       boxShadow: 'inner',
