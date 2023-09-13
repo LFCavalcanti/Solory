@@ -4,8 +4,10 @@ import { Flex } from '@chakra-ui/react';
 
 export default function FlexContent({
   children,
+  backgroundColor,
 }: {
   children: React.ReactNode;
+  backgroundColor?: string;
 }) {
   return (
     <Flex
@@ -14,6 +16,7 @@ export default function FlexContent({
       alignItems="center"
       justifyContent="center"
       flexDirection="column"
+      bg={backgroundColor}
     >
       {children}
     </Flex>
