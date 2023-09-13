@@ -1,8 +1,9 @@
 'use client';
 import getTableLocaleDate from '@/lib/getTableLocaleDate';
+import { tRegistryColumnDef } from '@/types/tRegistryColumnDef';
 import { ColumnDef } from '@tanstack/react-table';
 
-export const companyGroupTableColumns: ColumnDef<object, any>[] = [
+export const companyGroupTableColumns: ColumnDef<tRegistryColumnDef, any>[] = [
   {
     header: 'Status',
     accessorKey: 'isActive',
