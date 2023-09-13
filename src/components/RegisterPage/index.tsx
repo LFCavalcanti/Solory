@@ -45,16 +45,20 @@ import { BiBlock } from 'react-icons/bi';
 import { FaEllipsisVertical } from 'react-icons/fa6';
 import debounce from 'lodash.debounce';
 import { useRegistryFormStore } from '@/lib/hooks/state/useRegistryFormStore';
+import { useRegistryExportStore } from '@/lib/hooks/state/useRegistryExportStore';
 import RegistryModal from './RegistryModal';
+import RegistryExport from './RegistryExport';
 import { tBulkActionReturn } from '@/types/tBulkActionReturn';
 import LoadingSpinner from '../common/LoadingSpinner';
 import TopSuccessSlider from '../common/TopSuccessSlider';
 import TopErrorSlider from '../common/TopErrorSlider';
 import { useRouter } from 'next/navigation';
+import { tCompanyGroupTableRow } from '@/types/CompanyGroup/tCompanyGroup';
+import { tRegistryColumnDef } from '@/types/tRegistryColumnDef';
 
 interface Props {
   registerData: object[];
-  registerColumns: ColumnDef<object, any>[];
+  registerColumns: ColumnDef<tRegistryColumnDef, any>[];
   title: string;
   delAction?: 'disable' | 'delete';
   FormComponent: React.FC;
@@ -72,9 +76,13 @@ export default function RegisterPage({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [searchInput, setSearchInput] = useState('');
   const [filtering, setFiltering] = useState('');
-  const [isOpen, openForm] = useRegistryFormStore((state) => [
+  const [isFormOpen, openForm] = useRegistryFormStore((state) => [
     state.isOpen,
     state.openForm,
+  ]);
+  const [isModalOpen, openModal] = useRegistryExportStore((state) => [
+    state.isOpen,
+    state.openModal,
   ]);
 
   const router = useRouter();
@@ -87,7 +95,7 @@ export default function RegisterPage({
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const columns = useMemo<ColumnDef<object, any>[]>(
+  const columns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
     () => [
       {
         id: 'select',
@@ -198,7 +206,7 @@ export default function RegisterPage({
       return row.original;
     });
     const deleteResult = await deleteBulkFunction(selectedRows);
-    console.log(deleteResult);
+
     if (!deleteResult || (deleteResult && !deleteResult.result)) {
       setErrorMessage(
         !deleteResult
@@ -228,7 +236,8 @@ export default function RegisterPage({
         errorMessage={errorMessage}
         onClickCallBack={() => setIsErrorSlider(false)}
       />
-      {isOpen && <RegistryModal FormComponent={FormComponent} />}
+      {isFormOpen && <RegistryModal FormComponent={FormComponent} />}
+      {isModalOpen && <RegistryExport exportTitle={title} />}
       <Flex
         height="100%"
         width="100%"
@@ -307,9 +316,11 @@ export default function RegisterPage({
               variant="secondaryOutline"
               width={28}
               onClick={() =>
-                console.info(
-                  'table.getSelectedRowModel().flatRows',
-                  table.getSelectedRowModel().flatRows,
+                openModal(
+                  table.getSelectedRowModel().flatRows.map((row) => {
+                    return row.original;
+                  }),
+                  registerColumns,
                 )
               }
             >
