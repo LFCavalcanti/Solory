@@ -1,5 +1,4 @@
 'use client';
-import FlexGradient from '@/components/common/FlexGradient';
 import {
   ArrowBackIcon,
   UnlockIcon,

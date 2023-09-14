@@ -1,8 +1,8 @@
 import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import type { NextAuthOptions } from 'next-auth';
-import { Session } from 'next-auth';
-import { JWT } from 'next-auth/jwt';
+//import { Session } from 'next-auth';
+//import { JWT } from 'next-auth/jwt';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,7 +17,7 @@ export const authOptions: NextAuthOptions = {
         username: { label: 'Username', type: 'text', placeholder: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         // Add logic here to look up the user from the credentials supplied
         const res = await fetch(baseUrl + '/api/auth/login', {
           method: 'POST',
@@ -48,13 +48,13 @@ export const authOptions: NextAuthOptions = {
     newUser: '/auth/signup',
   },
   callbacks: {
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user }) {
       if (user) {
         token.emailVerified = user.emailVerified;
       }
       return token;
     },
-    async session({ session, user, token }) {
+    async session({ session, token }) {
       /*
       if (session?.user) {
         session.user.id = token.sub;

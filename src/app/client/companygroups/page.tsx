@@ -1,30 +1,28 @@
 import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
-import getApiAuthToken from '@/lib/getApiAuthToken';
 import { tCompanyGroup } from '@/types/CompanyGroup/tCompanyGroup';
-import {
-  companyGroupRegisterFields,
-  companyGroupTableColumns,
-} from './registerFields';
-import CompanyGroupForm from './companyGroupForm';
+import { companyGroupTableColumns } from './registerFields';
+import CompanyGroupForm from './companygroupform';
 import disableBulkCompanyGroup from './disableBulkCompanyGroup';
+import { headers } from 'next/headers';
 
 const getCompanyGroups = async (): Promise<tCompanyGroup[]> => {
   try {
     const companyGroups = await fetchApp({
       endpoint: `/api/internal/companygroups?orderBy=name&tableList=true`,
       cache: 'no-store',
-      authCookie: getApiAuthToken(),
+      rscHeaders: headers(),
     });
     return companyGroups.body;
   } catch (error) {
-    console.error(error);
+    console.error(`${error}`);
     throw error;
   }
 };
 
 export default async function companygroup() {
   const companyGroups = await getCompanyGroups();
+
   return (
     <>
       <RegisterPage
@@ -34,7 +32,7 @@ export default async function companygroup() {
         delAction="disable"
         FormComponent={CompanyGroupForm}
         deleteBulkFunction={disableBulkCompanyGroup}
-      ></RegisterPage>
+      />
     </>
   );
 }

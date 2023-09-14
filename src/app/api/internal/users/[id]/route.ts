@@ -1,13 +1,10 @@
 // import { verifyJwt } from '@/lib/jwt';
 import prisma from '@/lib/prisma';
-import { tUserProfile } from '@/types/User/tUser';
+//import { tUserProfile } from '@/types/User/tUser';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { NextRequest, NextResponse } from 'next/server';
 
-interface Params {
-  id: string;
-}
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
@@ -30,7 +27,7 @@ export async function PUT(
   request: Request,
   { params }: { params: { id: string } },
 ) {
-  let newUserData = await request.json();
+  const newUserData = await request.json();
   let newHashedPassword = '';
   let changedEmail = false;
   let changedPassword = false;

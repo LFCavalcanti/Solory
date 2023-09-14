@@ -29,7 +29,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import TopErrorSlider from '@/components/common/TopErrorSlider';
 import fetchApp from '@/lib/fetchApp';
 
-export default function IndexPage() {
+export default function SignUp() {
   const { push } = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isSignError, setIsSignError] = useState(false);
@@ -77,6 +77,15 @@ export default function IndexPage() {
       password: data.password,
       redirect: false,
     });
+
+    if (!newSession) {
+      setErrorMessage('Erro ao autenticar novo usuário');
+      setIsSignError(true);
+      console.error(newSession);
+      setIsProcessing(false);
+      return;
+    }
+
     push('/client/dashboard');
   };
 

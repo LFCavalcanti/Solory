@@ -1,3 +1,4 @@
+import { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
 import getNextBaseUrl from './getNextBaseUrl';
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
   revalidate?: number;
   cache?: 'no-store';
   authCookie?: string | null;
+  rscHeaders?: ReadonlyHeaders;
 }
 
 export default async function fetchApp({
@@ -20,15 +22,19 @@ export default async function fetchApp({
   revalidate,
   cache,
   authCookie = undefined,
+  rscHeaders = undefined,
 }: Props) {
   const response = await fetch(baseUrl + endpoint, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...(Authorization && { Authorization }),
-      ...(authCookie && { Cookie: authCookie }),
-    },
+    ...(rscHeaders && { headers: rscHeaders }),
+    ...(!rscHeaders && {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        ...(Authorization && { Authorization }),
+        ...(authCookie && { Cookie: authCookie }),
+      },
+    }),
     ...(body && { body }),
     ...(cache && { cache }),
     ...(revalidate && { next: { revalidate } }),

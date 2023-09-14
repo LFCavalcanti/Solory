@@ -26,7 +26,6 @@ import { useRef } from 'react';
 import { PiFileCsvDuotone, PiFilePdfDuotone } from 'react-icons/pi';
 import { useReactToPrint } from 'react-to-print';
 import { CSVLink } from 'react-csv';
-import type { Headers } from 'react-csv/components/CommonPropTypes';
 
 export default function RegistryExport({
   exportTitle,
@@ -69,7 +68,7 @@ export default function RegistryExport({
     return newRowData;
   });
 
-  const csvColumns: Headers = table.getAllFlatColumns().map((column) => {
+  const csvColumns = table.getAllFlatColumns().map((column) => {
     return {
       label: String(column.columnDef.header),
       key: String(column.id),
@@ -163,15 +162,8 @@ export default function RegistryExport({
                       {row.getVisibleCells().map((cell) => {
                         // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
                         const meta: any = cell.column.columnDef.meta;
-                        const rowData: any = row.original;
                         return (
-                          <Td
-                            key={cell.id}
-                            isNumeric={meta?.isNumeric}
-                            // color={
-                            //   rowData.isActive ? 'text.standard' : 'gray.400'
-                            // }
-                          >
+                          <Td key={cell.id} isNumeric={meta?.isNumeric}>
                             {flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext(),

@@ -63,7 +63,8 @@ export default function CompanyGroupForm() {
   });
 
   const submitCompanyGroup: SubmitHandler<tCompanyGroup> = async (data) => {
-    const { id, ...formData } = data;
+    delete data.id;
+
     if (action === 'delete') {
       const updatedData = await fetchApp({
         method: 'PUT',
@@ -74,7 +75,7 @@ export default function CompanyGroupForm() {
       });
 
       if (!updatedData || updatedData.status !== 200) {
-        setErrorMessage(`Erro ao desativar o grupo "${formData.name}"`);
+        setErrorMessage(`Erro ao desativar o grupo "${data.name}"`);
         setIsErrorSlider(true);
         return;
       }
@@ -93,15 +94,16 @@ export default function CompanyGroupForm() {
         action === 'insert'
           ? '/api/internal/companygroups'
           : `/api/internal/companygroups/${registryId}`,
-      body: JSON.stringify(formData),
+      body: JSON.stringify(data),
       cache: 'no-store',
     });
 
     if (!updatedData || updatedData.status !== 200) {
+      console.error(updatedData);
       const message =
         action === 'insert'
-          ? `Erro ao incluir grupo "${formData.name}"`
-          : `Erro ao editar grupo "${formData.name}"`;
+          ? `Erro ao incluir grupo "${data.name}"`
+          : `Erro ao editar grupo "${data.name}"`;
       setErrorMessage(message);
       setIsErrorSlider(true);
       return;
@@ -109,8 +111,8 @@ export default function CompanyGroupForm() {
 
     setSuccessMessage(
       action === 'insert'
-        ? `Grupo "${formData.name}" incluido com sucesso`
-        : `Grupo "${formData.name}" editado com sucesso`,
+        ? `Grupo "${data.name}" incluido com sucesso`
+        : `Grupo "${data.name}" editado com sucesso`,
     );
     setIsSuccessAlert(true);
     closeForm();

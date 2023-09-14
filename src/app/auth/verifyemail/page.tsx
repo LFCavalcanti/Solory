@@ -1,7 +1,7 @@
 'use client';
 import fetchApp from '@/lib/fetchApp';
-import { Button, Flex, Heading, Spinner, Text } from '@chakra-ui/react';
-import { Image, Link } from '@chakra-ui/next-js';
+import { Box, Button, Flex, Heading, Spinner, Text } from '@chakra-ui/react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { CloseIcon } from '@chakra-ui/icons';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -13,7 +13,7 @@ interface iValidationReturn {
   body: any;
 }
 
-export default function verifyEmail() {
+export default function VerifyEmail() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -74,13 +74,9 @@ export default function verifyEmail() {
           gap="4"
           paddingBottom={5}
         >
-          <Image
-            src="/logo_h.svg"
-            alt="Solory"
-            width={200}
-            height={42}
-            margin={4}
-          />
+          <Box padding={4}>
+            <Image src="/logo_h.svg" alt="Solory" width={200} height={42} />
+          </Box>
           <Heading color="text.standard" fontFamily="heading" fontSize={18}>
             {activationCall.body.alreadyVerified
               ? 'SEU ENDEREÇO DE E-MAIL JÁ FOI VALIDADO ANTERIORMENTE'
@@ -114,13 +110,9 @@ export default function verifyEmail() {
           gap="4"
           paddingBottom={5}
         >
-          <Image
-            src="/logo_h.svg"
-            alt="Solory"
-            width={200}
-            height={42}
-            margin={4}
-          />
+          <Box padding={4}>
+            <Image src="/logo_h.svg" alt="Solory" width={200} height={42} />
+          </Box>
           <Heading
             color="text.light"
             bg="error"

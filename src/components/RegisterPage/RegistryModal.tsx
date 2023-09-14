@@ -1,11 +1,5 @@
 import { useRegistryFormStore } from '@/lib/hooks/state/useRegistryFormStore';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-} from '@chakra-ui/react';
+import { Modal, ModalOverlay, ModalContent, ModalBody } from '@chakra-ui/react';
 
 export default function RegistryModal({
   FormComponent,

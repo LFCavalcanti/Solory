@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 
+const connPort: number = Number(process.env.PGSQL_PORT || '0');
 let postgre: Pool;
-let connPort: number = Number(process.env.PGSQL_PORT || '0');
 
 try {
   postgre = new Pool({

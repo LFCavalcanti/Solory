@@ -13,16 +13,15 @@ export default async function disableBulkCompanyGroup(
       return fetchApp({
         method: 'PUT',
         baseUrl: window.location.origin,
-        //endpoint: `/api/internal/companygroups/${item.id}`,
-        endpoint: `/api/internal/companygroups/40`,
+        endpoint: `/api/internal/companygroups/${item.id}`,
         body: JSON.stringify({ isActive: false }),
         cache: 'no-store',
       });
     }),
   )
     .then((apiResponses) => {
+      const errorMessagePile: string[] = [];
       let result = true;
-      let errorMessagePile: string[] = [];
       apiResponses.forEach((response) => {
         if (response.status === 'rejected') {
           result = false;

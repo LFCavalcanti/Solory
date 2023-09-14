@@ -53,7 +53,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import TopSuccessSlider from '../common/TopSuccessSlider';
 import TopErrorSlider from '../common/TopErrorSlider';
 import { useRouter } from 'next/navigation';
-import { tCompanyGroupTableRow } from '@/types/CompanyGroup/tCompanyGroup';
+//import { tCompanyGroupTableRow } from '@/types/CompanyGroup/tCompanyGroup';
 import { tRegistryColumnDef } from '@/types/tRegistryColumnDef';
 
 interface Props {
@@ -202,7 +202,7 @@ export default function RegisterPage({
 
   const handleBulkDelete = async () => {
     setIsProcessing(true);
-    let selectedRows = table.getSelectedRowModel().flatRows.map((row) => {
+    const selectedRows = table.getSelectedRowModel().flatRows.map((row) => {
       return row.original;
     });
     const deleteResult = await deleteBulkFunction(selectedRows);
@@ -289,10 +289,9 @@ export default function RegisterPage({
             boxShadow="sm"
           >
             <InputGroup size="md" maxWidth="40%">
-              <InputLeftElement
-                pointerEvents="none"
-                children={<Search2Icon color="gray.600" />}
-              />
+              <InputLeftElement pointerEvents="none">
+                <Search2Icon color="gray.600" />
+              </InputLeftElement>
               <Input
                 type="text"
                 placeholder="Buscar..."

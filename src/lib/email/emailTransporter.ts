@@ -7,12 +7,11 @@ export async function sendgridClientSender(msg: iSendGridMessage) {
   client
     .send(msg)
     .then((response: any) => {
-      //console.log(response[0].statusCode);
-      //console.log(response[0].headers);
+      if (response[0].statusCode !== 202 && response[0].statusCode !== 200)
+        throw new Error('Error sending e-mail');
       return true;
     })
     .catch((err: any) => {
-      //console.error(err);
       throw new Error(err);
     });
 }

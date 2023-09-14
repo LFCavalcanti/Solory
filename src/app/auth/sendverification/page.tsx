@@ -1,7 +1,15 @@
 'use client';
 import fetchApp from '@/lib/fetchApp';
-import { Button, Flex, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
-import { Image, Link } from '@chakra-ui/next-js';
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Spinner,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import { CloseIcon } from '@chakra-ui/icons';
@@ -13,20 +21,21 @@ interface iValidationReturn {
   body: any;
 }
 
-export default function sendVerification() {
+export default function SendVerification() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [resentEmail, setResentEmail] = useState(false);
   const [validationCall, setValidationCall] =
     useState<iValidationReturn | null>(null);
 
+  const userId = !session ? '' : session.user.id;
+
   const checkValidation = async (forceResend: boolean = false) => {
     const validationReturn = await fetchApp({
       method: 'POST',
       baseUrl: window.location.origin,
       endpoint: '/api/email/sendEmailVerification',
-      //@ts-ignore
-      body: JSON.stringify({ id: session.user.id, forceResend }),
+      body: JSON.stringify({ id: userId, forceResend }),
       cache: 'no-store',
     });
     return validationReturn;
@@ -80,13 +89,9 @@ export default function sendVerification() {
           gap="4"
           paddingBottom={5}
         >
-          <Image
-            src="/logo_h.svg"
-            alt="Solory"
-            width={200}
-            height={42}
-            margin={4}
-          />
+          <Box padding={4}>
+            <Image src="/logo_h.svg" alt="Solory" width={200} height={42} />
+          </Box>
           <Heading color="text.standard" fontFamily="heading" fontSize={18}>
             {validationCall.body.alreadySent
               ? 'A VERIFICAÇÃO JÁ FOI ENVIADA ANTERIORMENTE'
@@ -144,13 +149,9 @@ export default function sendVerification() {
           gap="4"
           paddingBottom={5}
         >
-          <Image
-            src="/logo_h.svg"
-            alt="Solory"
-            width={200}
-            height={42}
-            margin={4}
-          />
+          <Box padding={4}>
+            <Image src="/logo_h.svg" alt="Solory" width={200} height={42} />
+          </Box>
           <Heading color="text.standard" fontFamily="heading" fontSize={18}>
             SEU ENDEREÇO DE E-MAIL JÁ FOI VALIDADO
           </Heading>
@@ -182,13 +183,7 @@ export default function sendVerification() {
           gap="4"
           paddingBottom={5}
         >
-          <Image
-            src="/logo_h.svg"
-            alt="Solory"
-            width={200}
-            height={42}
-            margin={4}
-          />
+          <Image src="/logo_h.svg" alt="Solory" width={200} height={42} />
           <Heading
             color="text.light"
             bg="error"

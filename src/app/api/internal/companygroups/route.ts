@@ -4,7 +4,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: Request, response: Response) {
+export async function POST(request: Request) {
   const body = await request.json();
   const session = await getServerSession(authOptions);
 
