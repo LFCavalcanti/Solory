@@ -1,5 +1,6 @@
 import { ReadonlyHeaders } from 'next/dist/server/web/spec-extension/adapters/headers';
 import getNextBaseUrl from './getNextBaseUrl';
+import { tFechAppReturn } from '@/types/tFechAppReturn';
 
 interface Props {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -23,21 +24,26 @@ export default async function fetchApp({
   cache,
   authCookie = undefined,
   rscHeaders = undefined,
-}: Props) {
-  const response = await fetch(baseUrl + endpoint, {
-    method,
-    ...(rscHeaders && { headers: rscHeaders }),
-    ...(!rscHeaders && {
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        ...(Authorization && { Authorization }),
-        ...(authCookie && { Cookie: authCookie }),
-      },
-    }),
-    ...(body && { body }),
-    ...(cache && { cache }),
-    ...(revalidate && { next: { revalidate } }),
-  });
-  return { status: response.status, body: await response.json() };
+}: Props): Promise<tFechAppReturn> {
+  try {
+    const response = await fetch(baseUrl + endpoint, {
+      method,
+      ...(rscHeaders && { headers: rscHeaders }),
+      ...(!rscHeaders && {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          ...(Authorization && { Authorization }),
+          ...(authCookie && { Cookie: authCookie }),
+        },
+      }),
+      ...(body && { body }),
+      ...(cache && { cache }),
+      ...(revalidate && { next: { revalidate } }),
+    });
+    return { status: response.status, body: await response.json() };
+  } catch (error) {
+    console.error(`${error}`);
+    throw new Error(`${error}`);
+  }
 }
