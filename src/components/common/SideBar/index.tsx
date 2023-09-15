@@ -41,7 +41,7 @@ export default function SideBar() {
   ]);
   return (
     <Flex
-      height="100vh"
+      height="100%"
       width="200px"
       alignItems="center"
       justifyContent="top"

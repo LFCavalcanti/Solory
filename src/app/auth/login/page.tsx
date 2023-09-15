@@ -25,7 +25,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import FlexGradient from '@/components/common/FlexGradient';
-import TopErrorSlider from '@/components/common/TopErrorSlider';
+import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
+import TopMessageSlider from '@/components/common/TopMessageSlider';
 
 export default function LoginPage() {
   const callbackUrl = '/client/dashboard';
@@ -35,7 +36,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [invalidCredentials, setInvalidCredentials] = useState(false);
+
+  const sendTopMessage = useTopMessageSliderStore(
+    (state) => state.sendTopMessage,
+  );
 
   const tryLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -50,7 +54,7 @@ export default function LoginPage() {
     }
 
     if (!validatedPassword.success) {
-      setInvalidCredentials(true);
+      sendTopMessage('error', 'Usuário não existe ou senha inválida');
       return;
     }
 
@@ -60,7 +64,7 @@ export default function LoginPage() {
       redirect: false,
     });
     if (result?.status !== 200 || result?.error) {
-      setInvalidCredentials(true);
+      sendTopMessage('error', 'Usuário não existe ou senha inválida');
       return;
     }
     push(callbackUrl);
@@ -68,11 +72,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <TopErrorSlider
-        showError={invalidCredentials}
-        errorMessage={'Usuário ou Senha Inválidos'}
-        onClickCallBack={() => () => setInvalidCredentials(false)}
-      />
+      <TopMessageSlider />
       <FlexGradient>
         <Flex
           borderBottom="10px solid"

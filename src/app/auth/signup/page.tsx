@@ -26,15 +26,17 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import FlexGradient from '@/components/common/FlexGradient';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import TopErrorSlider from '@/components/common/TopErrorSlider';
 import fetchApp from '@/lib/fetchApp';
+import TopMessageSlider from '@/components/common/TopMessageSlider';
+import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 
 export default function SignUp() {
   const { push } = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [isSignError, setIsSignError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const sendTopMessage = useTopMessageSliderStore(
+    (state) => state.sendTopMessage,
+  );
   const {
     register,
     handleSubmit,
@@ -55,18 +57,17 @@ export default function SignUp() {
     });
 
     if (createdCredential.status === 409) {
-      setErrorMessage(
+      sendTopMessage(
+        'error',
         'Usuário já está cadastrado, se já acessou usando Google, Microsoft ou Github, defina uma senha pelo perfil',
       );
-      setIsSignError(true);
       console.error(createdCredential);
       setIsProcessing(false);
       return;
     }
 
     if (createdCredential.status !== 200) {
-      setErrorMessage('Serviço indisponível');
-      setIsSignError(true);
+      sendTopMessage('error', 'Serviço indisponível');
       console.error(createdCredential);
       setIsProcessing(false);
       return;
@@ -79,8 +80,7 @@ export default function SignUp() {
     });
 
     if (!newSession) {
-      setErrorMessage('Erro ao autenticar novo usuário');
-      setIsSignError(true);
+      sendTopMessage('error', 'Erro ao autenticar novo usuário');
       console.error(newSession);
       setIsProcessing(false);
       return;
@@ -92,11 +92,7 @@ export default function SignUp() {
   return (
     <>
       <LoadingSpinner showSpinner={isProcessing} />
-      <TopErrorSlider
-        showError={isSignError}
-        errorMessage={errorMessage}
-        onClickCallBack={() => setIsSignError(false)}
-      />
+      <TopMessageSlider />
       <FlexGradient>
         <Flex
           borderBottom="10px solid"

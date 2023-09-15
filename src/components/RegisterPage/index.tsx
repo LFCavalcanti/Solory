@@ -50,11 +50,9 @@ import RegistryModal from './RegistryModal';
 import RegistryExport from './RegistryExport';
 import { tBulkActionReturn } from '@/types/tBulkActionReturn';
 import LoadingSpinner from '../common/LoadingSpinner';
-import TopSuccessSlider from '../common/TopSuccessSlider';
-import TopErrorSlider from '../common/TopErrorSlider';
 import { useRouter } from 'next/navigation';
-//import { tCompanyGroupTableRow } from '@/types/CompanyGroup/tCompanyGroup';
 import { tRegistryColumnDef } from '@/types/tRegistryColumnDef';
+import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 
 interface Props {
   registerData: object[];
@@ -84,14 +82,10 @@ export default function RegisterPage({
     state.isOpen,
     state.openModal,
   ]);
-
+  const sendTopMessage = useTopMessageSliderStore(
+    (state) => state.sendTopMessage,
+  );
   const router = useRouter();
-
-  const [isErrorSlider, setIsErrorSlider] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const [isSuccessAlert, setIsSuccessAlert] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -208,17 +202,16 @@ export default function RegisterPage({
     const deleteResult = await deleteBulkFunction(selectedRows);
 
     if (!deleteResult || (deleteResult && !deleteResult.result)) {
-      setErrorMessage(
+      sendTopMessage(
+        'error',
         !deleteResult
           ? 'Erro ao processar requisição'
           : `Erro ao desativar os grupos ${deleteResult.errorMessagePile}`,
       );
-      setIsErrorSlider(true);
       setIsProcessing(false);
       return;
     }
-    setSuccessMessage('Grupos selecionados desativados com sucesso');
-    setIsSuccessAlert(true);
+    sendTopMessage('success', 'Grupos selecionados desativados com sucesso');
     setIsProcessing(false);
     router.refresh();
   };
@@ -226,16 +219,6 @@ export default function RegisterPage({
   return (
     <>
       <LoadingSpinner showSpinner={isProcessing} />
-      <TopSuccessSlider
-        showAlert={isSuccessAlert}
-        onClickCallBack={() => setIsSuccessAlert(false)}
-        alertMessage={successMessage}
-      />
-      <TopErrorSlider
-        showError={isErrorSlider}
-        errorMessage={errorMessage}
-        onClickCallBack={() => setIsErrorSlider(false)}
-      />
       {isFormOpen && <RegistryModal FormComponent={FormComponent} />}
       {isModalOpen && <RegistryExport exportTitle={title} />}
       <Flex

@@ -1,11 +1,23 @@
 import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import { CloseIcon } from '@chakra-ui/icons';
-import { Slide, Alert, AlertIcon, IconButton } from '@chakra-ui/react';
+import {
+  Slide,
+  Alert,
+  AlertIcon,
+  IconButton,
+  AlertTitle,
+  Flex,
+} from '@chakra-ui/react';
 
 export default function TopMessageSlider() {
-  const [isOpen, type, message, closeTopMessage] = useTopMessageSliderStore(
-    (state) => [state.isOpen, state.type, state.message, state.closeTopMessage],
-  );
+  const [isOpen, type, message, title, closeTopMessage] =
+    useTopMessageSliderStore((state) => [
+      state.isOpen,
+      state.type,
+      state.message,
+      state.title,
+      state.closeTopMessage,
+    ]);
 
   return (
     <Slide direction="top" in={isOpen} style={{ zIndex: 10 }}>
@@ -18,10 +30,21 @@ export default function TopMessageSlider() {
         marginLeft="auto"
         marginRight="auto"
         marginTop="10"
-        maxWidth="lg"
+        maxWidth="xl"
       >
         <AlertIcon boxSize={6} />
-        {message}
+        <Flex flexDirection="column">
+          {title && (
+            <AlertTitle
+              color="text.standard"
+              fontFamily="heading"
+              fontWeight="700"
+            >
+              {title}
+            </AlertTitle>
+          )}
+          {message}
+        </Flex>
         <IconButton
           padding={0}
           aria-label="Fechar alerta"
