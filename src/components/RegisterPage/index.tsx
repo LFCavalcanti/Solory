@@ -49,10 +49,10 @@ import { useRegistryExportStore } from '@/lib/hooks/state/useRegistryExportStore
 import RegistryModal from './RegistryModal';
 import RegistryExport from './RegistryExport';
 import { tBulkActionReturn } from '@/types/tBulkActionReturn';
-import LoadingSpinner from '../common/LoadingSpinner';
 import { useRouter } from 'next/navigation';
 import { tRegistryColumnDef } from '@/types/tRegistryColumnDef';
 import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
+import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 
 interface Props {
   registerData: object[];
@@ -82,12 +82,15 @@ export default function RegisterPage({
     state.isOpen,
     state.openModal,
   ]);
+  const [startProcessingSpinner, stopProcessingSpinner] =
+    useLoadingSpinnerStore((state) => [
+      state.startProcessingSpinner,
+      state.stopProcessingSpinner,
+    ]);
   const sendTopMessage = useTopMessageSliderStore(
     (state) => state.sendTopMessage,
   );
   const router = useRouter();
-
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const columns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
     () => [
@@ -195,7 +198,7 @@ export default function RegisterPage({
   });
 
   const handleBulkDelete = async () => {
-    setIsProcessing(true);
+    startProcessingSpinner();
     const selectedRows = table.getSelectedRowModel().flatRows.map((row) => {
       return row.original;
     });
@@ -208,17 +211,16 @@ export default function RegisterPage({
           ? 'Erro ao processar requisição'
           : `Erro ao desativar os grupos ${deleteResult.errorMessagePile}`,
       );
-      setIsProcessing(false);
+      stopProcessingSpinner();
       return;
     }
     sendTopMessage('success', 'Grupos selecionados desativados com sucesso');
-    setIsProcessing(false);
+    stopProcessingSpinner();
     router.refresh();
   };
 
   return (
     <>
-      <LoadingSpinner showSpinner={isProcessing} />
       {isFormOpen && <RegistryModal FormComponent={FormComponent} />}
       {isModalOpen && <RegistryExport exportTitle={title} />}
       <Flex

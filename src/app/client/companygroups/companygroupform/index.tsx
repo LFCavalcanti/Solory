@@ -22,20 +22,24 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 import getTableLocaleDate from '@/lib/getTableLocaleDate';
 import { useRouter } from 'next/navigation';
 import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import { tFechAppReturn } from '@/types/tFechAppReturn';
+import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 
 export default function CompanyGroupForm() {
   const router = useRouter();
 
+  const [startProcessingSpinner, stopProcessingSpinner] =
+    useLoadingSpinnerStore((state) => [
+      state.startProcessingSpinner,
+      state.stopProcessingSpinner,
+    ]);
+
   const sendTopMessage = useTopMessageSliderStore(
     (state) => state.sendTopMessage,
   );
-
-  const [isProcessing, setIsProcessing] = useState(true);
 
   const [registryId, setRegistryId] = useState<string>();
   const [registryCreatedAt, setRegistryCreatedAt] = useState<string>();
@@ -124,15 +128,16 @@ export default function CompanyGroupForm() {
   };
 
   useEffect(() => {
+    startProcessingSpinner();
     if (!registryData && action === 'insert') {
       reset({
         isActive: true,
       });
-      setIsProcessing(false);
+      stopProcessingSpinner();
       return;
     }
     if (!registryData && action !== 'insert') {
-      setIsProcessing(false);
+      stopProcessingSpinner();
       throw new Error('Must provide Company Group data');
     }
 
@@ -152,12 +157,12 @@ export default function CompanyGroupForm() {
         reset({
           ...result.body,
         });
-        setIsProcessing(false);
+        stopProcessingSpinner();
         setCompanyGroupData(result.body);
       })
       .catch((error) => {
         console.error(`FETCH ERROR: ${error}`);
-        setIsProcessing(false);
+        stopProcessingSpinner();
         throw error;
       });
   }, []);
@@ -165,7 +170,6 @@ export default function CompanyGroupForm() {
   const title = getTitleByAction('GRUPO DE EMPRESAS', action);
   return (
     <Flex direction="column" padding={4} gap={3} height="100%" width="100%">
-      <LoadingSpinner showSpinner={isProcessing} />
       <Heading
         mt={2}
         mb={4}

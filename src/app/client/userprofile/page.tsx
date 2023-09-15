@@ -20,13 +20,17 @@ import { tUserProfile, userProfileValidate } from '@/types/User/tUser';
 import { useEffect, useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import fetchApp from '@/lib/fetchApp';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
+import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 
 export default function UserProfile() {
   const [alterPassword, setAlterPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(true);
+  const [startProcessingSpinner, stopProcessingSpinner] =
+    useLoadingSpinnerStore((state) => [
+      state.startProcessingSpinner,
+      state.stopProcessingSpinner,
+    ]);
   const sendTopMessage = useTopMessageSliderStore(
     (state) => state.sendTopMessage,
   );
@@ -46,7 +50,7 @@ export default function UserProfile() {
   });
 
   const submitUser: SubmitHandler<tUserProfile> = async (data) => {
-    setIsProcessing(true);
+    startProcessingSpinner();
     const updatedData = await fetchApp({
       method: 'PUT',
       baseUrl: window.location.origin,
@@ -67,12 +71,12 @@ export default function UserProfile() {
         'Aviso de redirecionamento...',
       );
       setTimeout(() => signOut(), 60000);
-      setIsProcessing(false);
+      stopProcessingSpinner();
       return;
     }
 
     sendTopMessage('success', 'Dados alterados com sucesso');
-    setIsProcessing(false);
+    stopProcessingSpinner();
   };
 
   useEffect(() => {
@@ -81,10 +85,10 @@ export default function UserProfile() {
         name: session.user.name || undefined,
         email: session.user.email || undefined,
       });
-      setIsProcessing(false);
+      stopProcessingSpinner();
     }
     if (status === 'unauthenticated') {
-      setIsProcessing(false);
+      stopProcessingSpinner();
       sendTopMessage('error', 'Erro ao obter dados do seu perfil');
       return;
     }
@@ -100,7 +104,6 @@ export default function UserProfile() {
       padding={2}
       bg="whiteAlpha.500"
     >
-      {isProcessing && <LoadingSpinner showSpinner={isProcessing} />}
       <Flex
         borderBottom="10px solid"
         borderColor="contrast.500"

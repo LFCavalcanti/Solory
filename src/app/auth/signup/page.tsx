@@ -25,15 +25,19 @@ import { newUserValidate, tNewUser } from '@/types/User/tNewUser';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import FlexGradient from '@/components/common/FlexGradient';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
 import fetchApp from '@/lib/fetchApp';
 import TopMessageSlider from '@/components/common/TopMessageSlider';
 import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
+import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 
 export default function SignUp() {
   const { push } = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [startProcessingSpinner, stopProcessingSpinner] =
+    useLoadingSpinnerStore((state) => [
+      state.startProcessingSpinner,
+      state.stopProcessingSpinner,
+    ]);
   const sendTopMessage = useTopMessageSliderStore(
     (state) => state.sendTopMessage,
   );
@@ -46,7 +50,7 @@ export default function SignUp() {
   });
 
   const submitUser: SubmitHandler<tNewUser> = async (data) => {
-    setIsProcessing(true);
+    startProcessingSpinner();
 
     const createdCredential = await fetchApp({
       method: 'POST',
@@ -62,14 +66,14 @@ export default function SignUp() {
         'Usuário já está cadastrado, se já acessou usando Google, Microsoft ou Github, defina uma senha pelo perfil',
       );
       console.error(createdCredential);
-      setIsProcessing(false);
+      stopProcessingSpinner();
       return;
     }
 
     if (createdCredential.status !== 200) {
       sendTopMessage('error', 'Serviço indisponível');
       console.error(createdCredential);
-      setIsProcessing(false);
+      stopProcessingSpinner();
       return;
     }
 
@@ -82,7 +86,7 @@ export default function SignUp() {
     if (!newSession) {
       sendTopMessage('error', 'Erro ao autenticar novo usuário');
       console.error(newSession);
-      setIsProcessing(false);
+      stopProcessingSpinner();
       return;
     }
 
@@ -91,7 +95,6 @@ export default function SignUp() {
 
   return (
     <>
-      <LoadingSpinner showSpinner={isProcessing} />
       <TopMessageSlider />
       <FlexGradient>
         <Flex

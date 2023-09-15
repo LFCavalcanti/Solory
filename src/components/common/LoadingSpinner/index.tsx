@@ -1,3 +1,5 @@
+'use client';
+import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 import {
   Modal,
   ModalOverlay,
@@ -6,16 +8,13 @@ import {
   Spinner,
 } from '@chakra-ui/react';
 
-export default function LoadingSpinner({
-  showSpinner = true,
-}: {
-  showSpinner: boolean;
-}) {
+export default function LoadingSpinner() {
+  const isSpinnerOpen = useLoadingSpinnerStore((state) => state.isSpinnerOpen);
   return (
     <Modal
       isCentered
       size="full"
-      isOpen={showSpinner}
+      isOpen={isSpinnerOpen}
       onClose={() => null}
       motionPreset="slideInBottom"
     >

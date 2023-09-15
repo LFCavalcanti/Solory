@@ -1,3 +1,4 @@
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import AuthSessionProvider from '@/components/providers/AuthSessionProvider';
 import ChakraUiProvider from '@/components/providers/ChakraUiProvider';
 
@@ -18,7 +19,10 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body>
         <AuthSessionProvider>
-          <ChakraUiProvider>{children}</ChakraUiProvider>
+          <ChakraUiProvider>
+            <LoadingSpinner />
+            {children}
+          </ChakraUiProvider>
         </AuthSessionProvider>
       </body>
     </html>
