@@ -9,5 +9,5 @@ interface iLoadingSpinnerStore {
 export const useLoadingSpinnerStore = create<iLoadingSpinnerStore>()((set) => ({
   isSpinnerOpen: false,
   startProcessingSpinner: () => set({ isSpinnerOpen: true }),
-  stopProcessingSpinner: () => set({ isSpinnerOpen: true }),
+  stopProcessingSpinner: () => set({ isSpinnerOpen: false }),
 }));
