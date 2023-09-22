@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const newCompanyGroupValidate = z.object({
-  name: z.string().nonempty().max(100).trim().toUpperCase(),
-  description: z.string().nonempty().trim().toUpperCase(),
+  name: z.string().trim().nonempty().max(100).toUpperCase(),
+  description: z.string().trim().nonempty().toUpperCase(),
   shareSuppliers: z
     .boolean({
       invalid_type_error: 'shareSuppliers must be a boolean',
