@@ -87,7 +87,7 @@ model CompanyGroup {
 
 model UserToCompanyGroup {
   id             String @id @default(cuid())
-  active         Boolean @default(true)
+  isActive         Boolean @default(true)
   createdAt      DateTime
   expiredAt      DateTime?
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -102,7 +102,7 @@ model Company {
   isActive     Boolean @default(true)
   createdAt       DateTime
   disabledAt      DateTime?
-  aliasName    String
+  aliasName    String @db.VarChar(60)
   fullName     String
   cnpj         String @db.VarChar(14)
   logo         String?
@@ -116,14 +116,16 @@ model Company {
   users        UserToCompany[]
   adresses     CompanyAddress[]
   companyCnaeIss CompanyCnaeIss[]
+  simplesNacConfigs simplesNacConfig[]
   @@unique([cnpj, companyGroupId])
-  @@index([isActive, companyGroupId])
+  @@index([isActive, companyGroupId, cnpj])
   @@index([isActive, aliasName])
+  @@index([isActive, cnpj])
 }
 
 model UserToCompany {
   id        String  @id @default(cuid())
-  active    Boolean @default(true)
+  isActive     Boolean @default(true)
   createdAt DateTime
   expiredAt DateTime?
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -135,35 +137,31 @@ model UserToCompany {
 
 model CompanyAddress {
   id  String @id @default(cuid())
+  isActive     Boolean @default(true)
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
+  isMainAddress Boolean
   street String
   lotNumber String
-  complement String
+  complement String?
   locale String
-  cep String @db.VarChar(8)
+  postalCode String
   state String
-  cities   cities @relation(fields: [cityCode], references: [code], onDelete: Cascade)
+  cities   cities @relation(fields: [cityCode], references: [code])
   cityCode String
-  information String @db.Text
+  information String? @db.Text
+  @@index([isActive, companyId, isMainAddress])
 }
 
 model CompanyCnaeIss {
   id  String @id @default(cuid())
+  isActive     Boolean @default(true)
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
-  cnae   Cnae @relation(fields: [cnaeCode], references: [code], onDelete: Cascade)
   cnaeCode String @db.VarChar(7)
+  description     String
   issCode String? @db.VarChar(4)
-}
-
-model Cnae {
-  code String @id @db.VarChar(7)
-  descricao String @db.Text
-  annex String
-  rFactor Boolean
-  aliquot Float
-  companyCnaeIss CompanyCnaeIss[]
+  @@index([isActive, companyId, cnaeCode])
 }
 
 model cities {
@@ -171,4 +169,19 @@ model cities {
   name String
   state String
   companyAdress CompanyAddress[]
+  @@index([state, code])
+}
+
+model simplesNacConfig {
+  id  String @id @default(cuid())
+  createdAt DateTime
+  expiredAt DateTime?
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  cnaeCode String @db.VarChar(7)
+  anexoSimples String
+  isEligibleRFactor Boolean
+  rFactor Float
+  aliquotStandard Float
+  aliquotRFactor Float
 }
