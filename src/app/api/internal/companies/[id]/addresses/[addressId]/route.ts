@@ -36,7 +36,7 @@ export async function GET(
   if (!companyAddress) {
     return new Response(
       JSON.stringify({
-        message: `### ID ${params.id} does not exist or insufficient permission`,
+        message: `### ID ${params.addressId} does not exist or insufficient permission`,
       }),
       {
         status: 404,
@@ -107,7 +107,7 @@ export async function PUT(
   if (!companyAddress) {
     return new Response(
       JSON.stringify({
-        message: `### ID ${params.id} does not exist or insufficient permission`,
+        message: `### ID ${params.addressId} does not exist or insufficient permission`,
       }),
       {
         status: 403,
@@ -116,7 +116,7 @@ export async function PUT(
   }
 
   const updatedCompanyAddress = await prisma.companyAddress.update({
-    where: { id: params.id },
+    where: { id: params.addressId },
     data: {
       ...(validatedSchema.data.isActive == false &&
         companyAddress.isActive == true && {

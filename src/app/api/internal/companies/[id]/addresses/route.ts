@@ -37,7 +37,7 @@ export async function GET(
   if (!companyAddresses) {
     return new Response(
       JSON.stringify({
-        message: `### ID ${params.id} does not exist or insufficient permission`,
+        message: `### Company Addresses for ID ${params.id} does not exist or insufficient permission`,
       }),
       {
         status: 404,
