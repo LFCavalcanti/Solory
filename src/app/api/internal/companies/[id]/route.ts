@@ -132,4 +132,6 @@ export async function PUT(
       },
     );
   }
+
+  return new Response(JSON.stringify(updatedCompany));
 }

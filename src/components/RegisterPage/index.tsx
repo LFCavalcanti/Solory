@@ -205,16 +205,17 @@ export default function RegisterPage({
     const deleteResult = await deleteBulkFunction(selectedRows);
 
     if (!deleteResult || (deleteResult && !deleteResult.result)) {
+      console.error(deleteResult);
       sendTopMessage(
         'error',
         !deleteResult
           ? 'Erro ao processar requisição'
-          : `Erro ao desativar os grupos ${deleteResult.errorMessagePile}`,
+          : `Erro ao desativar os registros ${deleteResult.errorMessagePile}`,
       );
       stopProcessingSpinner();
       return;
     }
-    sendTopMessage('success', 'Grupos selecionados desativados com sucesso');
+    sendTopMessage('success', 'Registros selecionados desativados com sucesso');
     stopProcessingSpinner();
     router.refresh();
   };
