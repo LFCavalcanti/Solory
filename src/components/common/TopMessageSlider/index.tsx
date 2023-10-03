@@ -20,7 +20,7 @@ export default function TopMessageSlider() {
     ]);
 
   return (
-    <Slide direction="top" in={isOpen} style={{ zIndex: 10 }}>
+    <Slide direction="top" in={isOpen} style={{ zIndex: 90000 }}>
       <Alert
         status={type}
         paddingLeft={10}
