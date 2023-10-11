@@ -66,6 +66,45 @@ export async function POST(request: Request) {
     );
   }
 
+  //--> CHECAR SE PELO MENOS UM ENDEREÇO FOI ENVIADO E SE O MAIN ESTA CORRETO
+  if (!validatedCompanyAddresses || validatedCompanyAddresses.length < 1) {
+    return new Response(
+      JSON.stringify({
+        message: 'Must have at least one Address',
+      }),
+      {
+        status: 400,
+      },
+    );
+  }
+
+  const mainAddresses = validatedCompanyAddresses.filter((address) => {
+    return address.isMainAddress;
+  });
+
+  if (!mainAddresses || mainAddresses.length < 1) {
+    return new Response(
+      JSON.stringify({
+        message: 'Must have at least one MAIN Address',
+      }),
+      {
+        status: 400,
+      },
+    );
+  }
+
+  if (mainAddresses && mainAddresses.length > 1) {
+    return new Response(
+      JSON.stringify({
+        message: 'Only one address can be MAIN',
+      }),
+      {
+        status: 400,
+      },
+    );
+  }
+
+  //--> CHECAR SE AS CIDADES ESTÃO CORRETAS
   try {
     await Promise.all(
       validatedCompanyAddresses.map(async (address) => {
@@ -129,6 +168,17 @@ export async function POST(request: Request) {
     );
   }
   //-------------------------------------------------------->
+
+  if (!validatedCompanyCnaeIsses || validatedCompanyCnaeIsses.length < 1) {
+    return new Response(
+      JSON.stringify({
+        message: 'Must have at least one CNAE vs ISS',
+      }),
+      {
+        status: 400,
+      },
+    );
+  }
 
   //--> CRIAR EMPRESA
   const createdAt = new Date().toISOString();

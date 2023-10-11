@@ -52,7 +52,6 @@ export async function PUT(
 ) {
   const session = await getServerSession(authOptions);
   const body = await request.json();
-  const currentDate = new Date().toISOString();
 
   if (!session || !session.user.id) {
     return new Response(
@@ -115,17 +114,29 @@ export async function PUT(
     );
   }
 
+  //--> CHECAR SE HA PELO MENOS UM ENDEREÇO ATIVO EM CASO DE DESATIVAÇÃO
+  if (!validatedSchema.data.isActive) {
+    const activeCnaeIss = await prisma.companyCnaeIss.findMany({
+      where: {
+        isActive: true,
+        companyId: params.id,
+      },
+    });
+    if (activeCnaeIss.length < 2) {
+      return new Response(
+        JSON.stringify({
+          message: 'At least one CNAE vs ISS has to remain active',
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  }
+
   const updatedCompanyCnaeIss = await prisma.companyCnaeIss.update({
     where: { id: params.cnaeIssId },
     data: {
-      ...(validatedSchema.data.isActive == false &&
-        companyCnaeIss.isActive == true && {
-          disabledAt: currentDate,
-        }),
-      ...(validatedSchema.data.isActive == true &&
-        companyCnaeIss.isActive == false && {
-          disabledAt: null,
-        }),
       ...validatedSchema.data,
     },
   });

@@ -28,3 +28,50 @@ export const companyTableColumns: ColumnDef<tRegistryColumnDef, any>[] = [
     cell: (info) => getTableLocaleDate(info.getValue()),
   },
 ];
+
+export const companyAddressTableColumns: ColumnDef<tRegistryColumnDef, any>[] =
+  [
+    {
+      header: 'Status',
+      accessorKey: 'isActive',
+      cell: (info) => (info.getValue() ? 'ATIVO' : 'INATIVO'),
+    },
+    {
+      header: 'Tipo Endereço',
+      accessorKey: 'isMainAddress',
+      cell: (info) => (info.getValue() ? 'PRINCIPAL' : '-'),
+    },
+    {
+      header: 'Endereço',
+      accessorKey: 'street',
+    },
+    {
+      header: 'Estado',
+      accessorKey: 'state',
+    },
+    {
+      header: 'Código Cidade',
+      accessorKey: 'cityCode',
+    },
+  ];
+
+export const companyCnaeIssTableColumns: ColumnDef<tRegistryColumnDef, any>[] =
+  [
+    {
+      header: 'Status',
+      accessorKey: 'isActive',
+      cell: (info) => (info.getValue() ? 'ATIVO' : 'INATIVO'),
+    },
+    {
+      header: 'Descrição',
+      accessorKey: 'description',
+    },
+    {
+      header: 'CNAE',
+      accessorKey: 'cnaeCode',
+    },
+    {
+      header: 'ISS',
+      accessorKey: 'issCode',
+    },
+  ];

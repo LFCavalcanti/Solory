@@ -11,7 +11,12 @@ export const newCompanyValidate = z.object({
     .max(14),
   logo: z.string().optional(),
   mainCnae: z.string().trim().nonempty().regex(/\d{7}/).max(7),
-  mainIssCode: z.string().trim().nonempty().regex(/\d{4}/).max(4).optional(),
+  mainIssCode: z
+    .string()
+    .trim()
+    .regex(/\d{4}|^$/)
+    .max(4)
+    .optional(),
   isMei: z.boolean().optional(),
   isSimplesNac: z.boolean().optional(),
   phone: z
@@ -40,7 +45,12 @@ export const companyValidate = z.object({
     .optional(),
   logo: z.string().optional(),
   mainCnae: z.string().trim().nonempty().regex(/\d{7}/).max(7).optional(),
-  mainIssCode: z.string().trim().nonempty().regex(/\d{4}/).max(4).optional(),
+  mainIssCode: z
+    .string()
+    .trim()
+    .regex(/\d{4}|^$/)
+    .max(4)
+    .optional(),
   isMei: z.boolean().optional(),
   isSimplesNac: z.boolean().optional(),
   phone: z

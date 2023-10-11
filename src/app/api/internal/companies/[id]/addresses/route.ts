@@ -81,9 +81,24 @@ export async function POST(
     );
   }
 
-  //--> CRIAR EMPRESA
+  //--> CRIA ENDEREÇO
   let companyAdress: any = null;
   try {
+    if (validatedSchema.data.isMainAddress) {
+      const existingMain = await prisma.companyAddress.findFirst({
+        where: { companyId: params.id, isMainAddress: true },
+      });
+      if (existingMain) {
+        return new Response(
+          JSON.stringify({
+            message: 'Only one adddress can be main',
+          }),
+          {
+            status: 400,
+          },
+        );
+      }
+    }
     companyAdress = await prisma.companyAddress.create({
       data: {
         companyId: params.id,

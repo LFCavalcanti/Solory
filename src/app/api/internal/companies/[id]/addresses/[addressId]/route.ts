@@ -52,7 +52,6 @@ export async function PUT(
 ) {
   const session = await getServerSession(authOptions);
   const body = await request.json();
-  const currentDate = new Date().toISOString();
 
   if (!session || !session.user.id) {
     return new Response(
@@ -115,17 +114,62 @@ export async function PUT(
     );
   }
 
+  //--> CHECAR REGRA DE ENDEREÇO PRINCIPAL ANTES DE ALTERAR
+  if (validatedSchema.data.isMainAddress !== companyAddress.isMainAddress) {
+    const existingMain = await prisma.companyAddress.findFirst({
+      where: {
+        isMainAddress: true,
+        isActive: true,
+        companyId: params.id,
+      },
+    });
+
+    if (validatedSchema.data.isMainAddress && existingMain) {
+      return new Response(
+        JSON.stringify({
+          message: 'Only one adddress can be main',
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (!validatedSchema.data.isMainAddress && !existingMain) {
+      return new Response(
+        JSON.stringify({
+          message: 'At least one adddress has to be main',
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  }
+
+  //--> CHECAR SE HA PELO MENOS UM ENDEREÇO ATIVO EM CASO DE DESATIVAÇÃO
+  if (!validatedSchema.data.isActive) {
+    const activeAddresses = await prisma.companyAddress.findMany({
+      where: {
+        isActive: true,
+        companyId: params.id,
+      },
+    });
+    if (activeAddresses.length < 2) {
+      return new Response(
+        JSON.stringify({
+          message: 'At least one adddress has to remain active',
+        }),
+        {
+          status: 400,
+        },
+      );
+    }
+  }
+
   const updatedCompanyAddress = await prisma.companyAddress.update({
     where: { id: params.addressId },
     data: {
-      ...(validatedSchema.data.isActive == false &&
-        companyAddress.isActive == true && {
-          disabledAt: currentDate,
-        }),
-      ...(validatedSchema.data.isActive == true &&
-        companyAddress.isActive == false && {
-          disabledAt: null,
-        }),
       ...validatedSchema.data,
     },
   });
