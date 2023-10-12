@@ -19,6 +19,10 @@ export const useCompanyCnaeIssStore = create<iCompanyCnaeIssStore>()((set) => ({
   updateCnaeIss: (cnaeIss: tCompanyCnaeIss) => {
     set((state) => ({
       cnaeIssList: state.cnaeIssList.map((item) => {
+        if (!item.id) {
+          if (item.cnaeCode === cnaeIss.cnaeCode) return cnaeIss;
+          return item;
+        }
         if (item.id === cnaeIss.id) return cnaeIss;
         return item;
       }),
