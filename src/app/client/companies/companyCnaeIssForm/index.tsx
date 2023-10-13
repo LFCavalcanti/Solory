@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRegistryFormStore } from '@/lib/hooks/state/useRegistryFormStore';
 import { tRegistryAction } from '@/types/tRegistryAction';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
-import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import getButtonNameByAction from '@/lib/tokens/getButtonNameByAction';
 import {
@@ -22,6 +21,7 @@ import {
   Switch,
   Button,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import fetchApp from '@/lib/fetchApp';
 import { tFechAppReturn } from '@/types/tFechAppReturn';
@@ -54,10 +54,7 @@ export default function CompanyAddressForm({
       state.startProcessingSpinner,
       state.stopProcessingSpinner,
     ]);
-  const sendTopMessage = useTopMessageSliderStore(
-    (state) => state.sendTopMessage,
-  );
-
+  const toast = useToast();
   const [insertCnaeIss, updateCnaeIss, removeCnaeIss] = useCompanyCnaeIssStore(
     (state) => [state.insertCnaeIss, state.updateCnaeIss, state.removeCnaeIss],
   );
@@ -80,19 +77,28 @@ export default function CompanyAddressForm({
     if (action === 'insert') {
       if (formAction === 'delete') {
         removeCnaeIss(data);
-        sendTopMessage('success', 'Cnae x ISS removido com sucesso');
+        toast({
+          title: 'Cnae x ISS removido com sucesso',
+          status: 'success',
+        });
         setIsFormOpen(false);
         return;
       }
       if (formAction === 'edit') {
         updateCnaeIss(data);
-        sendTopMessage('success', 'Cnae x ISS atualizado com sucesso');
+        toast({
+          title: 'Cnae x ISS atualizado com sucesso',
+          status: 'success',
+        });
         setIsFormOpen(false);
         return;
       }
       if (formAction === 'insert') {
         insertCnaeIss(data);
-        sendTopMessage('success', 'CNAE x ISS inserido com sucesso');
+        toast({
+          title: 'CNAE x ISS inserido com sucesso',
+          status: 'success',
+        });
         setIsFormOpen(false);
         return;
       }
@@ -111,15 +117,18 @@ export default function CompanyAddressForm({
           throw Error('Error calling FetchApp');
       } catch (error) {
         console.error(error);
-        sendTopMessage(
-          'error',
-          `Erro ao desativar o CNAE x ISS "${data.description}"`,
-        );
+        toast({
+          title: `Erro ao desativar o CNAE x ISS "${data.description}"`,
+          status: 'error',
+        });
         setIsFormOpen(false);
         return;
       }
 
-      sendTopMessage('success', 'Dados alterados com sucesso');
+      toast({
+        title: 'Dados alterados com sucesso',
+        status: 'success',
+      });
       setIsFormOpen(false);
       return;
     }
@@ -147,18 +156,21 @@ export default function CompanyAddressForm({
         formAction === 'insert'
           ? `Erro ao incluir CNAE x ISS "${data?.description}"`
           : `Erro ao editar CNAE x ISS "${data?.description}"`;
-      sendTopMessage('error', message);
+      toast({
+        title: message,
+        status: 'error',
+      });
       setIsFormOpen(false);
       return;
     }
 
-    sendTopMessage(
-      'success',
-      formAction === 'insert'
-        ? `CNAE x ISS "${data?.description}" incluido com sucesso`
-        : `CNAE x ISS "${data?.description}" editado com sucesso`,
-    );
-
+    toast({
+      title:
+        formAction === 'insert'
+          ? `CNAE x ISS "${data?.description}" incluido com sucesso`
+          : `CNAE x ISS "${data?.description}" editado com sucesso`,
+      status: 'success',
+    });
     setIsFormOpen(false);
     return;
   };
@@ -198,7 +210,10 @@ export default function CompanyAddressForm({
       })
       .catch((error) => {
         console.error(`FETCH ERROR: ${error}`);
-        sendTopMessage('error', 'Erro ao obter informações do CNAE x ISS');
+        toast({
+          title: 'Erro ao obter informações do CNAE x ISS',
+          status: 'error',
+        });
         stopProcessingSpinner();
         setIsFormOpen(false);
         throw error;

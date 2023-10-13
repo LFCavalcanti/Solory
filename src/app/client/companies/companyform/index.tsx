@@ -32,11 +32,11 @@ import {
   Th,
   Thead,
   Tr,
+  useToast,
 } from '@chakra-ui/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import getTableLocaleDate from '@/lib/getTableLocaleDate';
 import { useRouter } from 'next/navigation';
-import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import { tFechAppReturn } from '@/types/tFechAppReturn';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 import {
@@ -79,10 +79,7 @@ export default function CompanyForm() {
       state.startProcessingSpinner,
       state.stopProcessingSpinner,
     ]);
-
-  const sendTopMessage = useTopMessageSliderStore(
-    (state) => state.sendTopMessage,
-  );
+  const toast = useToast();
 
   const cnpjApiInputRef = useRef<HTMLInputElement>(null);
 
@@ -273,7 +270,10 @@ export default function CompanyForm() {
     let updatedData: tFechAppReturn;
 
     if (!addressList || addressList.length < 1) {
-      sendTopMessage('error', `Deve manter pelo menos um endereço`);
+      toast({
+        title: 'Deve manter pelo menos um endereço',
+        status: 'error',
+      });
       return;
     }
 
@@ -282,23 +282,26 @@ export default function CompanyForm() {
     });
 
     if (!mainAddresses || mainAddresses.length < 1) {
-      sendTopMessage(
-        'error',
-        `Pelo menos um endereço deve ser marcado como principal`,
-      );
+      toast({
+        title: `Pelo menos um endereço deve ser marcado como principal`,
+        status: 'error',
+      });
       return;
     }
 
     if (mainAddresses && mainAddresses.length > 1) {
-      sendTopMessage(
-        'error',
-        `Apenas um endereço pode ser marcado como principal`,
-      );
+      toast({
+        title: `Apenas um endereço pode ser marcado como principal`,
+        status: 'error',
+      });
       return;
     }
 
     if (!cnaeIssList || cnaeIssList.length < 1) {
-      sendTopMessage('error', `Deve manter pelo menos um CNAE vs ISS`);
+      toast({
+        title: `Deve manter pelo menos um CNAE vs ISS`,
+        status: 'error',
+      });
       return;
     }
 
@@ -315,14 +318,16 @@ export default function CompanyForm() {
           throw Error('Error calling FetchApp');
       } catch (error) {
         console.error(error);
-        sendTopMessage(
-          'error',
-          `Erro ao desativar a empresa "${data.aliasName}"`,
-        );
+        toast({
+          title: `Erro ao desativar a empresa "${data.aliasName}"`,
+          status: 'error',
+        });
         return;
       }
-
-      sendTopMessage('success', 'Dados alterados com sucesso');
+      toast({
+        title: 'Dados alterados com sucesso',
+        status: 'success',
+      });
       closeForm();
       router.refresh();
       return;
@@ -353,16 +358,19 @@ export default function CompanyForm() {
         action === 'insert'
           ? `Erro ao incluir empresa "${data.aliasName}"`
           : `Erro ao editar empresa "${data.aliasName}"`;
-      sendTopMessage('error', message);
+      toast({
+        title: message,
+        status: 'error',
+      });
       return;
     }
-
-    sendTopMessage(
-      'success',
-      action === 'insert'
-        ? `Empresa "${data.aliasName}" incluida com sucesso`
-        : `Empresa "${data.aliasName}" editada com sucesso`,
-    );
+    toast({
+      title:
+        action === 'insert'
+          ? `Empresa "${data.aliasName}" incluida com sucesso`
+          : `Empresa "${data.aliasName}" editada com sucesso`,
+      status: 'success',
+    });
 
     closeForm();
     router.refresh();
@@ -384,7 +392,10 @@ export default function CompanyForm() {
     );
 
     if (!cnpjFromForm.success) {
-      sendTopMessage('error', `CNPJ inválido`);
+      toast({
+        title: `CNPJ inválido`,
+        status: 'error',
+      });
       stopProcessingSpinner();
       return;
     }
@@ -394,7 +405,10 @@ export default function CompanyForm() {
     );
 
     if (!apiDataReturn || apiDataReturn.status !== 200) {
-      sendTopMessage('error', `Erro ao consultar dados do CNPJ`);
+      toast({
+        title: `CNPJ inválido`,
+        status: 'error',
+      });
       stopProcessingSpinner();
       return;
     }

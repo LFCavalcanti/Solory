@@ -20,11 +20,11 @@ import {
   Input,
   Switch,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import getTableLocaleDate from '@/lib/getTableLocaleDate';
 import { useRouter } from 'next/navigation';
-import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import { tFechAppReturn } from '@/types/tFechAppReturn';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 
@@ -37,9 +37,7 @@ export default function CompanyGroupForm() {
       state.stopProcessingSpinner,
     ]);
 
-  const sendTopMessage = useTopMessageSliderStore(
-    (state) => state.sendTopMessage,
-  );
+  const toast = useToast();
 
   const [registryId, setRegistryId] = useState<string>();
   const [registryCreatedAt, setRegistryCreatedAt] = useState<string>();
@@ -80,12 +78,18 @@ export default function CompanyGroupForm() {
           throw Error('Error calling FetchApp');
       } catch (error) {
         console.error(error);
-        sendTopMessage('error', `Erro ao desativar o grupo "${data.name}"`);
+        toast({
+          title: `Erro ao desativar o grupo "${data.name}"`,
+          status: 'error',
+        });
         closeForm();
         return;
       }
 
-      sendTopMessage('success', 'Dados alterados com sucesso');
+      toast({
+        title: 'Dados alterados com sucesso',
+        status: 'success',
+      });
       closeForm();
       router.refresh();
       return;
@@ -110,17 +114,21 @@ export default function CompanyGroupForm() {
         action === 'insert'
           ? `Erro ao incluir grupo "${data.name}"`
           : `Erro ao editar grupo "${data.name}"`;
-      sendTopMessage('error', message);
+      toast({
+        title: message,
+        status: 'error',
+      });
       closeForm();
       return;
     }
 
-    sendTopMessage(
-      'success',
-      action === 'insert'
-        ? `Grupo "${data.name}" incluido com sucesso`
-        : `Grupo "${data.name}" editado com sucesso`,
-    );
+    toast({
+      title:
+        action === 'insert'
+          ? `Grupo "${data.name}" incluido com sucesso`
+          : `Grupo "${data.name}" editado com sucesso`,
+      status: 'success',
+    });
 
     closeForm();
     router.refresh();

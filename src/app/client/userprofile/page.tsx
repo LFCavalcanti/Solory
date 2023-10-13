@@ -13,6 +13,7 @@ import {
   InputRightElement,
   IconButton,
   Switch,
+  useToast,
 } from '@chakra-ui/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,7 +21,6 @@ import { tUserProfile, userProfileValidate } from '@/types/User/tUser';
 import { useEffect, useState } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import fetchApp from '@/lib/fetchApp';
-import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 
 export default function UserProfile() {
@@ -31,9 +31,7 @@ export default function UserProfile() {
       state.startProcessingSpinner,
       state.stopProcessingSpinner,
     ]);
-  const sendTopMessage = useTopMessageSliderStore(
-    (state) => state.sendTopMessage,
-  );
+  const toast = useToast();
   const { data: session, status } = useSession();
 
   const {
@@ -60,22 +58,29 @@ export default function UserProfile() {
     });
 
     if (!updatedData || updatedData.status !== 200) {
-      sendTopMessage('error', 'Erro ao atualizar dados');
+      toast({
+        title: 'Erro ao atualizar dados',
+        status: 'error',
+      });
       return;
     }
 
     if (updatedData.body.changedEmail || updatedData.body.changedPassword) {
-      sendTopMessage(
-        'info',
-        'Você alterou seu e-mail ou sua senha, por isso precisará e efetuar login novamente e/ou revalidar seu e-mail. Redirecionando em 5 segundos.',
-        'Aviso de redirecionamento...',
-      );
+      toast({
+        title: 'Aviso de redirecionamento...',
+        description:
+          'Você alterou seu e-mail ou sua senha, por isso precisará e efetuar login novamente e/ou revalidar seu e-mail. Redirecionando em 5 segundos.',
+        status: 'info',
+      });
       setTimeout(() => signOut(), 60000);
       stopProcessingSpinner();
       return;
     }
 
-    sendTopMessage('success', 'Dados alterados com sucesso');
+    toast({
+      title: 'Dados alterados com sucesso',
+      status: 'success',
+    });
     stopProcessingSpinner();
   };
 
@@ -89,7 +94,10 @@ export default function UserProfile() {
     }
     if (status === 'unauthenticated') {
       stopProcessingSpinner();
-      sendTopMessage('error', 'Erro ao obter dados do seu perfil');
+      toast({
+        title: 'Erro ao obter dados do seu perfil',
+        status: 'error',
+      });
       return;
     }
   }, [status]);

@@ -10,6 +10,7 @@ import {
   InputRightElement,
   IconButton,
   Spacer,
+  useToast,
 } from '@chakra-ui/react';
 //import { Image } from '@chakra-ui/next-js';
 import Image from 'next/image';
@@ -25,7 +26,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import FlexGradient from '@/components/common/FlexGradient';
-import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import TopMessageSlider from '@/components/common/TopMessageSlider';
 
 export default function LoginPage() {
@@ -36,10 +36,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  const sendTopMessage = useTopMessageSliderStore(
-    (state) => state.sendTopMessage,
-  );
+  const toast = useToast();
 
   const tryLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -54,7 +51,10 @@ export default function LoginPage() {
     }
 
     if (!validatedPassword.success) {
-      sendTopMessage('error', 'Usuário não existe ou senha inválida');
+      toast({
+        title: 'Usuário não existe ou senha inválida',
+        status: 'error',
+      });
       return;
     }
 
@@ -64,7 +64,10 @@ export default function LoginPage() {
       redirect: false,
     });
     if (result?.status !== 200 || result?.error) {
-      sendTopMessage('error', 'Usuário não existe ou senha inválida');
+      toast({
+        title: 'Usuário não existe ou senha inválida',
+        status: 'error',
+      });
       return;
     }
     push(callbackUrl);

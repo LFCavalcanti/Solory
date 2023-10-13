@@ -11,6 +11,7 @@ import {
   InputRightElement,
   Box,
   Heading,
+  useToast,
 } from '@chakra-ui/react';
 import {
   UnlockIcon,
@@ -27,20 +28,17 @@ import { useRouter } from 'next/navigation';
 import FlexGradient from '@/components/common/FlexGradient';
 import fetchApp from '@/lib/fetchApp';
 import TopMessageSlider from '@/components/common/TopMessageSlider';
-import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 
 export default function SignUp() {
   const { push } = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const toast = useToast();
   const [startProcessingSpinner, stopProcessingSpinner] =
     useLoadingSpinnerStore((state) => [
       state.startProcessingSpinner,
       state.stopProcessingSpinner,
     ]);
-  const sendTopMessage = useTopMessageSliderStore(
-    (state) => state.sendTopMessage,
-  );
   const {
     register,
     handleSubmit,
@@ -61,17 +59,22 @@ export default function SignUp() {
     });
 
     if (createdCredential.status === 409) {
-      sendTopMessage(
-        'error',
-        'Usuário já está cadastrado, se já acessou usando Google, Microsoft ou Github, defina uma senha pelo perfil',
-      );
+      toast({
+        title: 'Usuário já está cadastrado',
+        description:
+          'De já acessou usando Google, Microsoft ou Github, defina uma senha pelo perfil',
+        status: 'error',
+      });
       console.error(createdCredential);
       stopProcessingSpinner();
       return;
     }
 
     if (createdCredential.status !== 200) {
-      sendTopMessage('error', 'Serviço indisponível');
+      toast({
+        title: 'Serviço indisponível',
+        status: 'error',
+      });
       console.error(createdCredential);
       stopProcessingSpinner();
       return;
@@ -84,7 +87,10 @@ export default function SignUp() {
     });
 
     if (!newSession) {
-      sendTopMessage('error', 'Erro ao autenticar novo usuário');
+      toast({
+        title: 'Erro ao autenticar novo usuário',
+        status: 'error',
+      });
       console.error(newSession);
       stopProcessingSpinner();
       return;

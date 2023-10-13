@@ -27,6 +27,7 @@ import {
   Thead,
   Tr,
   chakra,
+  useToast,
 } from '@chakra-ui/react';
 import {
   useReactTable,
@@ -51,7 +52,6 @@ import RegistryExport from './RegistryExport';
 import { tBulkActionReturn } from '@/types/tBulkActionReturn';
 import { useRouter } from 'next/navigation';
 import { tRegistryColumnDef } from '@/types/tRegistryColumnDef';
-import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 
 interface Props {
@@ -87,9 +87,7 @@ export default function RegisterPage({
       state.startProcessingSpinner,
       state.stopProcessingSpinner,
     ]);
-  const sendTopMessage = useTopMessageSliderStore(
-    (state) => state.sendTopMessage,
-  );
+  const toast = useToast();
   const router = useRouter();
 
   const columns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
@@ -206,16 +204,19 @@ export default function RegisterPage({
 
     if (!deleteResult || (deleteResult && !deleteResult.result)) {
       console.error(deleteResult);
-      sendTopMessage(
-        'error',
-        !deleteResult
+      toast({
+        title: !deleteResult
           ? 'Erro ao processar requisição'
           : `Erro ao desativar os registros ${deleteResult.errorMessagePile}`,
-      );
+        status: 'error',
+      });
       stopProcessingSpinner();
       return;
     }
-    sendTopMessage('success', 'Registros selecionados desativados com sucesso');
+    toast({
+      title: 'Registros selecionados desativados com sucesso',
+      status: 'success',
+    });
     stopProcessingSpinner();
     router.refresh();
   };

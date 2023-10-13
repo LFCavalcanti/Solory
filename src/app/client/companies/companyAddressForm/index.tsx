@@ -9,7 +9,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRegistryFormStore } from '@/lib/hooks/state/useRegistryFormStore';
 import { tRegistryAction } from '@/types/tRegistryAction';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
-import { useTopMessageSliderStore } from '@/lib/hooks/state/useTopMessageSliderStore';
 import { useCompanyAddressesStore } from '@/lib/hooks/state/useCompanyAddressesStore';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import getButtonNameByAction from '@/lib/tokens/getButtonNameByAction';
@@ -27,6 +26,7 @@ import {
   Switch,
   Button,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import fetchApp from '@/lib/fetchApp';
 import { tFechAppReturn } from '@/types/tFechAppReturn';
@@ -54,10 +54,7 @@ export default function CompanyAddressForm({
       state.startProcessingSpinner,
       state.stopProcessingSpinner,
     ]);
-  const sendTopMessage = useTopMessageSliderStore(
-    (state) => state.sendTopMessage,
-  );
-
+  const toast = useToast();
   const [insertAddress, updateAddress, removeAddress] =
     useCompanyAddressesStore((state) => [
       state.insertAddress,
@@ -83,19 +80,28 @@ export default function CompanyAddressForm({
     if (action === 'insert') {
       if (formAction === 'delete') {
         removeAddress(data);
-        sendTopMessage('success', 'Endereço removido com sucesso');
+        toast({
+          title: 'Endereço removido com sucesso',
+          status: 'success',
+        });
         setIsFormOpen(false);
         return;
       }
       if (formAction === 'edit') {
         updateAddress(data);
-        sendTopMessage('success', 'Cnae x ISS atualizado com sucesso');
+        toast({
+          title: 'Cnae x ISS atualizado com sucesso',
+          status: 'success',
+        });
         setIsFormOpen(false);
         return;
       }
       if (formAction === 'insert') {
         insertAddress(data);
-        sendTopMessage('success', 'Endereço inserido com sucesso');
+        toast({
+          title: 'Endereço inserido com sucesso',
+          status: 'success',
+        });
         setIsFormOpen(false);
         return;
       }
@@ -114,15 +120,18 @@ export default function CompanyAddressForm({
           throw Error('Error calling FetchApp');
       } catch (error) {
         console.error(error);
-        sendTopMessage(
-          'error',
-          `Erro ao desativar o endereço "${data.street}"`,
-        );
+        toast({
+          title: `Erro ao desativar o endereço "${data.street}"`,
+          status: 'error',
+        });
         setIsFormOpen(false);
         return;
       }
 
-      sendTopMessage('success', 'Dados alterados com sucesso');
+      toast({
+        title: 'Dados alterados com sucesso',
+        status: 'success',
+      });
       setIsFormOpen(false);
       return;
     }
@@ -150,17 +159,21 @@ export default function CompanyAddressForm({
         formAction === 'insert'
           ? `Erro ao incluir endereço "${data?.street}"`
           : `Erro ao editar endereço "${data?.street}"`;
-      sendTopMessage('error', message);
+      toast({
+        title: message,
+        status: 'error',
+      });
       setIsFormOpen(false);
       return;
     }
 
-    sendTopMessage(
-      'success',
-      formAction === 'insert'
-        ? `Endereço "${data?.street}" incluido com sucesso`
-        : `Endereço "${data?.street}" editado com sucesso`,
-    );
+    toast({
+      title:
+        formAction === 'insert'
+          ? `Endereço "${data?.street}" incluido com sucesso`
+          : `Endereço "${data?.street}" editado com sucesso`,
+      status: 'success',
+    });
 
     setIsFormOpen(false);
     return;
@@ -201,7 +214,10 @@ export default function CompanyAddressForm({
       })
       .catch((error) => {
         console.error(`FETCH ERROR: ${error}`);
-        sendTopMessage('error', 'Erro ao obter informações do endereço');
+        toast({
+          title: 'Erro ao obter informações do endereço',
+          status: 'error',
+        });
         stopProcessingSpinner();
         setIsFormOpen(false);
         throw error;
