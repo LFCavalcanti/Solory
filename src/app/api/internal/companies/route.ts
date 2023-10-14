@@ -204,6 +204,25 @@ export async function POST(request: Request) {
         },
       },
     });
+
+    const usersFromGroup = await prisma.userToCompanyGroup.findMany({
+      where: {
+        companyGroupId: company.companyGroupId,
+        NOT: { userId: session.user.id },
+      },
+    });
+
+    const permissionToAdd = usersFromGroup.map((item) => {
+      return {
+        createdAt,
+        userId: item.userId,
+        companyId: company.id,
+      };
+    });
+
+    await prisma.userToCompany.createMany({
+      data: permissionToAdd,
+    });
   } catch (error) {
     console.error(error);
     return new Response(
