@@ -1,8 +1,8 @@
 import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
-import { companyTableColumns } from './registerFields';
-import CompanyForm from './companyform';
-import disableBulkCompany from './disableBulkCompany';
+import { companyTableColumns } from '@/components/registers/company/registerFields';
+import CompanyForm from '@/components/registers/company/companyform';
+import disableBulkCompany from '@/components/registers/company/disableBulkCompany';
 import { headers } from 'next/headers';
 import { tCompany } from '@/types/Company/tCompany';
 

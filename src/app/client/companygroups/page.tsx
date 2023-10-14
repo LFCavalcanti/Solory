@@ -1,9 +1,9 @@
 import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
 import { tCompanyGroup } from '@/types/CompanyGroup/tCompanyGroup';
-import { companyGroupTableColumns } from './registerFields';
-import CompanyGroupForm from './companygroupform';
-import disableBulkCompanyGroup from './disableBulkCompanyGroup';
+import { companyGroupTableColumns } from '@/components/registers/companyGroup/registerFields';
+import CompanyGroupForm from '@/components/registers/companyGroup/companygroupform';
+import disableBulkCompanyGroup from '@/components/registers/companyGroup/disableBulkCompanyGroup';
 import { headers } from 'next/headers';
 
 const getCompanyGroups = async (): Promise<tCompanyGroup[]> => {
