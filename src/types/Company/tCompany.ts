@@ -43,7 +43,7 @@ export const companyValidate = z.object({
     .regex(/\d{14}/)
     .max(14)
     .optional(),
-  logo: z.string().optional(),
+  logo: z.string().nullable().optional(),
   mainCnae: z.string().trim().nonempty().regex(/\d{7}/).max(7).optional(),
   mainIssCode: z
     .string()

@@ -169,6 +169,7 @@ export default function CompanyForm() {
                   fontSize="12px"
                   color="text.standard"
                   icon={<ViewIcon />}
+                  type="button"
                   onClick={() => openAddressForm(cellData, 'view')}
                 >
                   Visualizar
@@ -180,6 +181,7 @@ export default function CompanyForm() {
                       fontWeight="500"
                       fontSize="12px"
                       color="text.standard"
+                      type="button"
                       icon={<EditIcon />}
                       onClick={() => openAddressForm(cellData, 'edit')}
                     >
@@ -190,6 +192,7 @@ export default function CompanyForm() {
                       fontWeight="500"
                       fontSize="12px"
                       color="text.standard"
+                      type="button"
                       icon={<BiBlock />}
                       onClick={() => openAddressForm(cellData, 'delete')}
                     >
@@ -227,6 +230,7 @@ export default function CompanyForm() {
                   fontWeight="500"
                   fontSize="12px"
                   color="text.standard"
+                  type="button"
                   icon={<ViewIcon />}
                   onClick={() => openCnaeIssForm(cellData, 'view')}
                 >
@@ -239,6 +243,7 @@ export default function CompanyForm() {
                       fontWeight="500"
                       fontSize="12px"
                       color="text.standard"
+                      type="button"
                       icon={<EditIcon />}
                       onClick={() => openCnaeIssForm(cellData, 'edit')}
                     >
@@ -249,6 +254,7 @@ export default function CompanyForm() {
                       fontWeight="500"
                       fontSize="12px"
                       color="text.standard"
+                      type="button"
                       icon={<BiBlock />}
                       onClick={() => openCnaeIssForm(cellData, 'delete')}
                     >
@@ -266,6 +272,10 @@ export default function CompanyForm() {
   );
 
   const submitCompany: SubmitHandler<tCompany> = async (data) => {
+    if (action === 'view') {
+      closeForm();
+      return;
+    }
     delete data.id;
     let updatedData: tFechAppReturn;
 
@@ -342,7 +352,7 @@ export default function CompanyForm() {
             ? '/api/internal/companies'
             : `/api/internal/companies/${registryId}`,
         body: JSON.stringify({
-          company: data,
+          ...data,
           ...(action === 'insert' && {
             addresses: addressList,
             cnaeIss: cnaeIssList,
@@ -371,7 +381,6 @@ export default function CompanyForm() {
           : `Empresa "${data.aliasName}" editada com sucesso`,
       status: 'success',
     });
-
     closeForm();
     router.refresh();
     return;
@@ -635,35 +644,41 @@ export default function CompanyForm() {
             : getTableLocaleDate(registryDisabledAt || '')}
         </Text>
       </Flex>
-      <Flex padding={2} gap={2} justifyContent="flex-start" alignItems="center">
-        <Text fontSize="14px" color="text.standard">
-          CNPJ para busca:
-        </Text>
-        <Input
-          ref={cnpjApiInputRef}
-          type="text"
-          variant="outline"
-          fontSize="14px"
-          placeholder="00000000000000"
-          bg="backgroundLight"
-          focusBorderColor="contrast.500"
-          errorBorderColor="error"
-          color="text.standard"
-          maxW={40}
-          rounded={0}
-        />
-        <Button
-          width={36}
-          variant="contrast"
-          onClick={() => getCompanyDataFromApi()}
-          leftIcon={<MdOutlineWidgets />}
+      {action === 'insert' && (
+        <Flex
+          padding={2}
+          gap={2}
+          justifyContent="flex-start"
+          alignItems="center"
         >
-          CONSULTAR
-        </Button>
-      </Flex>
-      <form
-        onSubmit={action === 'view' ? closeForm : handleSubmit(submitCompany)}
-      >
+          <Text fontSize="14px" color="text.standard">
+            CNPJ para busca:
+          </Text>
+          <Input
+            ref={cnpjApiInputRef}
+            type="text"
+            variant="outline"
+            fontSize="14px"
+            placeholder="00000000000000"
+            bg="backgroundLight"
+            focusBorderColor="contrast.500"
+            errorBorderColor="error"
+            color="text.standard"
+            maxW={40}
+            rounded={0}
+          />
+          <Button
+            width={36}
+            variant="contrast"
+            type="button"
+            onClick={() => getCompanyDataFromApi()}
+            leftIcon={<MdOutlineWidgets />}
+          >
+            CONSULTAR
+          </Button>
+        </Flex>
+      )}
+      <form onSubmit={handleSubmit(submitCompany)}>
         <Tabs variant="registryTabs">
           <TabList>
             <Tab>Principal</Tab>
@@ -933,6 +948,7 @@ export default function CompanyForm() {
                     // eslint-disable-next-line react/jsx-no-undef
                     leftIcon={<AddIcon />}
                     variant="primaryOutline"
+                    type="button"
                     onClick={() => openCnaeIssForm(null, 'insert')}
                     maxW={24}
                   >
@@ -1004,6 +1020,7 @@ export default function CompanyForm() {
                     variant="primaryOutline"
                     onClick={() => openAddressForm(null, 'insert')}
                     maxW={24}
+                    type="button"
                   >
                     Incluir
                   </Button>

@@ -50,13 +50,24 @@ export async function PUT(
   const body = await request.json();
   const currentDate = new Date().toISOString();
 
-  if (!session || !session.user.id) {
+  if (!session || !session.user || !session.user.id) {
     return new Response(
       JSON.stringify({
         message: 'Invalid Session',
       }),
       {
         status: 401,
+      },
+    );
+  }
+
+  if (!body) {
+    return new Response(
+      JSON.stringify({
+        message: 'Incorrect payload',
+      }),
+      {
+        status: 400,
       },
     );
   }

@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   }
 
   //--> CHECAR PAYLOAD SE ESTA COM OS DADOS CORRETOS
-  const validatedCompanySchema = newCompanyValidate.safeParse(body.company);
+  const validatedCompanySchema = newCompanyValidate.safeParse(body);
 
   if (!validatedCompanySchema.success) {
     console.error(validatedCompanySchema.error);

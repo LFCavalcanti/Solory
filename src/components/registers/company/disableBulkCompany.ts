@@ -3,13 +3,13 @@ import fetchApp from '@/lib/fetchApp';
 import { tCompanyTableRow } from '@/types/Company/tCompany';
 
 export default async function disableBulkCompany(
-  companyGroups: tCompanyTableRow[],
+  companies: tCompanyTableRow[],
 ) {
-  if (!companyGroups)
+  if (!companies)
     return { result: false, errorMessagePile: ['Dados inválidos'] };
 
   return Promise.allSettled(
-    companyGroups.map((item) => {
+    companies.map((item) => {
       return fetchApp({
         method: 'PUT',
         baseUrl: window.location.origin,
