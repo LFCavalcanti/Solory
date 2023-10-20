@@ -22,7 +22,7 @@ export default function SideMenu({
         as={Button}
         width="200px"
         height="50px"
-        variant={'primary'}
+        variant={'sidebar'}
         cursor={'pointer'}
         textAlign="left"
       >

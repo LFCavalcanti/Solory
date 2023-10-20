@@ -6,6 +6,17 @@ export const ButtonStyles = {
   },
   sizes: {},
   variants: {
+    sidebar: {
+      bg: 'brandPrimary.500',
+      color: 'text.darkMode',
+      fontWeight: '400',
+      _hover: {
+        bg: 'brandPrimary.400',
+      },
+      _active: {
+        bg: 'brandPrimary.300',
+      },
+    },
     primary: {
       bg: 'brandPrimary.500',
       color: 'text.darkMode',
