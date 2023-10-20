@@ -49,6 +49,14 @@ model User {
   companyGroups UserToCompanyGroup[]
   companies     UserToCompany[]
   emailValidationTokens emailValidationToken[]
+  settings      UserSettings[]
+}
+
+model UserSettings {
+  id String    @id @default(cuid())
+  userId       String @unique
+  activeCompanyId String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
