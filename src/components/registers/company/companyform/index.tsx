@@ -713,7 +713,7 @@ export default function CompanyForm() {
                         ref={ref}
                         onChange={onChange}
                         value={value}
-                        isReadOnly={action !== 'insert'}
+                        pointerEvents={action !== 'insert' ? 'none' : 'auto'}
                       >
                         {companyGroupsList.map((item) => (
                           <option key={item.value} value={item.value}>
