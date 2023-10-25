@@ -41,7 +41,7 @@ import { iCompanyMenu } from './menuData';
 
 export default function SideBar() {
   const { data: session, status } = useSession();
-  const { push } = useRouter();
+  const router = useRouter();
   const [userCompanies, setUserCompanies] = useState<iCompanyMenu[]>([]);
   const [userSettings, setUserSettings] = useUserSettingsStore((state) => [
     state.userSettings,
@@ -112,6 +112,7 @@ export default function SideBar() {
     };
     await updateUserSettingsOnDb(updatedSetting);
     setUserSettings(updatedSetting);
+    router.refresh();
   };
 
   const loadInitialUserData = async () => {
@@ -167,7 +168,7 @@ export default function SideBar() {
           cursor={'pointer'}
           textAlign="left"
           justifyContent="flex-start"
-          onClick={() => push('/client/dashboard')}
+          onClick={() => router.push('/client/dashboard')}
         >
           Dashboard
         </Button>
@@ -258,7 +259,7 @@ export default function SideBar() {
             />
           </MenuButton>
           <MenuList>
-            <MenuItem onClick={() => push('/client/userprofile')}>
+            <MenuItem onClick={() => router.push('/client/userprofile')}>
               Meu Perfil
             </MenuItem>
             <MenuItem>Configurações</MenuItem>
@@ -274,7 +275,7 @@ export default function SideBar() {
           variant={'sidebar'}
           cursor={'pointer'}
           textAlign="left"
-          onClick={() => push('/client/dashboard')}
+          onClick={() => router.push('/client/dashboard')}
         >
           <Icon as={IoExitOutline} boxSize={8} />
         </Button>
