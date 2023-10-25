@@ -91,6 +91,7 @@ model CompanyGroup {
   shareKpi        Boolean @default(true) @db.Boolean
   companies       Company[]
   users           UserToCompanyGroup[]
+  products        product[]
 }
 
 model UserToCompanyGroup {
@@ -125,6 +126,8 @@ model Company {
   adresses     CompanyAddress[]
   companyCnaeIss CompanyCnaeIss[]
   simplesNacConfigs simplesNacConfig[]
+  products product[]
+
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
   @@index([isActive, aliasName])
@@ -170,6 +173,36 @@ model CompanyCnaeIss {
   description     String
   issCode String? @db.VarChar(4)
   @@index([isActive, companyId, cnaeCode])
+}
+
+model product {
+  id String @id @default(cuid())
+  isActive Boolean @default(true)
+  createdAt       DateTime
+  disabledAt      DateTime?
+  code String
+  description String
+  productType productType @relation(fields: [typeId], references: [id])
+  typeId String
+  ncm String
+  codCnae String
+  codIss String
+  codebar String?
+  gtin String?
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  companyGroup   CompanyGroup @relation(fields: [companyGroupId], references: [id], onDelete: Cascade)
+  companyGroupId String
+  @@unique([code, companyId])
+  @@index([companyId, code])
+  @@index([companyGroupId, code])
+  @@index([companyGroupId, companyId, code])
+}
+
+model productType {
+  id String @id
+  description String
+  products product[]
 }
 
 model cities {
