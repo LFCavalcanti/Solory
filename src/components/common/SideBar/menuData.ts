@@ -22,14 +22,24 @@ export const companyMenu: iMenuItem[] = [
     destination: '/client/companies',
   },
   {
+    key: 'contractTypes',
+    label: 'Tipos de Contratos',
+    destination: '/client/contracttypes',
+  },
+  {
     key: 'produtos',
     label: 'Produtos',
     destination: '/client/products',
   },
   {
-    key: 'contractTypes',
-    label: 'Tipos de Contratos',
-    destination: '/client/contracttypes',
+    key: 'suppliers',
+    label: 'Fornecedores',
+    destination: '/client/suppliers',
+  },
+  {
+    key: 'supplierContacts',
+    label: 'Contatos Fornecedor',
+    destination: '/client/supplierscontacts',
   },
 ];
 
@@ -41,7 +51,7 @@ export const customerMenu: iMenuItem[] = [
   },
   {
     key: 'customerContacts',
-    label: 'Contatos',
+    label: 'Contatos Cliente',
     destination: '/client/customercontacts',
   },
   {
@@ -77,6 +87,11 @@ export const financeMenu: iMenuItem[] = [
     label: 'Fluxo de Caixa',
     destination: '/client/cashflow',
   },
+  {
+    key: 'bankAccount',
+    label: 'Conta Bancária',
+    destination: '/client/bankaccounts',
+  },
 ];
 
 export const operationMenu: iMenuItem[] = [
@@ -89,5 +104,10 @@ export const operationMenu: iMenuItem[] = [
     key: 'projectExecution',
     label: 'Execução de Projeto',
     destination: '/client/projectexecution',
+  },
+  {
+    key: 'standaloneSale',
+    label: 'Venda Avulsa',
+    destination: '/client/standalonesale',
   },
 ];
