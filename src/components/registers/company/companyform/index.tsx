@@ -430,8 +430,14 @@ export default function CompanyForm() {
       fullName: companyApiData.razao_social,
       cnpj: companyApiData.cnpj,
       mainCnae: String(companyApiData.cnae_fiscal),
-      isMei: companyApiData.opcao_pelo_mei,
-      isSimplesNac: companyApiData.opcao_pelo_simples,
+      isMei:
+        companyApiData.opcao_pelo_mei == null
+          ? false
+          : companyApiData.opcao_pelo_mei,
+      isSimplesNac:
+        companyApiData.opcao_pelo_simples == null
+          ? false
+          : companyApiData.opcao_pelo_simples,
       phone: companyApiData.ddd_telefone_1,
     };
 

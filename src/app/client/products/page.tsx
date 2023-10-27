@@ -26,7 +26,7 @@ export default async function companygroup() {
   return (
     <>
       <RegisterPage
-        title="GRUPOS DE EMPRESAS"
+        title="PRODUTOS"
         registerData={products}
         registerColumns={productTableColumns}
         delAction="disable"

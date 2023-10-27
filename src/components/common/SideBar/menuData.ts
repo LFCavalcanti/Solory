@@ -22,6 +22,11 @@ export const companyMenu: iMenuItem[] = [
     destination: '/client/companies',
   },
   {
+    key: 'simplesNacConfig',
+    label: 'Config Simples Nacional',
+    destination: '/client/simplesnacconfig',
+  },
+  {
     key: 'contractTypes',
     label: 'Tipos de Contratos',
     destination: '/client/contracttypes',
