@@ -91,7 +91,8 @@ model CompanyGroup {
   shareKpi        Boolean @default(true) @db.Boolean
   companies       Company[]
   users           UserToCompanyGroup[]
-  products        product[]
+  products        Product[]
+  suppliers       Supplier[]
 }
 
 model UserToCompanyGroup {
@@ -126,7 +127,8 @@ model Company {
   adresses     CompanyAddress[]
   companyCnaeIss CompanyCnaeIss[]
   simplesNacConfigs simplesNacConfig[]
-  products product[]
+  suppliers Supplier[]
+  products Product[]
 
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
@@ -175,7 +177,7 @@ model CompanyCnaeIss {
   @@index([isActive, companyId, cnaeCode])
 }
 
-model product {
+model Product {
   id String @id @default(cuid())
   isActive Boolean @default(true)
   createdAt       DateTime
@@ -202,14 +204,15 @@ model product {
 model productType {
   id String @id
   description String
-  products product[]
+  products Product[]
 }
 
 model cities {
   code String @id
   name String
   state String
-  companyAdress CompanyAddress[]
+  companyAddress CompanyAddress[]
+  supplierAddress SupplierAddress[]
   @@index([state, code])
 }
 
@@ -225,4 +228,48 @@ model simplesNacConfig {
   rFactor Float
   aliquotStandard Float
   aliquotRFactor Float
+}
+
+model Supplier {
+  id           String @id @default(cuid())
+  isActive     Boolean @default(true)
+  createdAt       DateTime
+  disabledAt      DateTime?
+  code          String
+  aliasName    String @db.VarChar(60)
+  fullName     String
+  cnpj         String @db.VarChar(14)
+  logo         String?
+  isMei        Boolean @default(false)
+  isSimplesNac Boolean @default(false)
+  phone        String
+  company         Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  companyGroup         CompanyGroup     @relation(fields: [companyGroupId], references: [id], onDelete: Cascade)
+  companyGroupId String
+  adresses     SupplierAddress[]
+
+  @@unique([cnpj, companyGroupId])
+  @@index([isActive, companyGroupId, cnpj])
+  @@index([isActive, aliasName])
+  @@index([isActive, cnpj])
+  @@index([isActive, id])
+}
+
+model SupplierAddress {
+  id  String @id @default(cuid())
+  isActive     Boolean @default(true)
+  supplier   Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  supplierId String
+  isMainAddress Boolean
+  street String
+  lotNumber String
+  complement String?
+  locale String
+  postalCode String
+  state String
+  cities   cities @relation(fields: [cityCode], references: [code])
+  cityCode String
+  information String? @db.Text
+  @@index([isActive, supplierId, isMainAddress])
 }
