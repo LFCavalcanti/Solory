@@ -54,3 +54,30 @@ export const supplierAddressTableColumns: ColumnDef<tRegistryColumnDef, any>[] =
       accessorKey: 'cityCode',
     },
   ];
+
+export const supplierContactTableColumns: ColumnDef<tRegistryColumnDef, any>[] =
+  [
+    {
+      header: 'Status',
+      accessorKey: 'isActive',
+      cell: (info) => (info.getValue() ? 'ATIVO' : 'INATIVO'),
+    },
+    {
+      header: 'Nome',
+      accessorKey: 'name',
+    },
+    {
+      header: 'Cargo',
+      accessorKey: 'role',
+    },
+    {
+      header: 'Data Criação',
+      accessorKey: 'createdAt',
+      cell: (info) => getTableLocaleDate(info.getValue()),
+    },
+    {
+      header: 'Data Desativação',
+      accessorKey: 'disabledAt',
+      cell: (info) => getTableLocaleDate(info.getValue()),
+    },
+  ];

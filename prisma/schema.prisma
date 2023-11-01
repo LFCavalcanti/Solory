@@ -248,6 +248,7 @@ model Supplier {
   companyGroup         CompanyGroup     @relation(fields: [companyGroupId], references: [id], onDelete: Cascade)
   companyGroupId String
   adresses     SupplierAddress[]
+  contacts    SupplierContact[]
 
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
@@ -272,4 +273,17 @@ model SupplierAddress {
   cityCode String
   information String? @db.Text
   @@index([isActive, supplierId, isMainAddress])
+}
+
+model SupplierContact {
+  id  String @id @default(cuid())
+  isActive     Boolean @default(true)
+  createdAt DateTime
+  expiredAt DateTime?
+  name String
+  role String
+  email String
+  phone String
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
 }

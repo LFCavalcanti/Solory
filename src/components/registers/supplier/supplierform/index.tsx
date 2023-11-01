@@ -59,8 +59,13 @@ import {
 } from '@/types/Supplier/tSupplier';
 import { tSupplierAddress } from '@/types/Supplier/tSupplierAddress';
 import { useSupplierAddressesStore } from '@/lib/hooks/state/useSupplierAddressesStore';
-import { supplierAddressTableColumns } from '../registerFields';
+import {
+  supplierAddressTableColumns,
+  supplierContactTableColumns,
+} from '../registerFields';
 import SupplierAddressForm from '../supplierAddressForm';
+import { useSupplierContactStore } from '@/lib/hooks/state/useSupplierContactStore';
+import SupplierContactForm from '../suppliercontactform';
 
 export default function SupplierForm() {
   const router = useRouter();
@@ -84,6 +89,12 @@ export default function SupplierForm() {
   const [selectedAddress, setSelectedAddress] =
     useState<tSupplierAddress | null>(null);
 
+  const [isContactFormOpen, setContactFormOpen] = useState(false);
+  const [contactFormAction, setContactFormAction] =
+    useState<tRegistryAction>(null);
+  const [selectedContact, setSelectedContact] =
+    useState<tSupplierAddress | null>(null);
+
   const [supplierData, setSupplierData] = useState<tSupplier>();
 
   const [addressList, setAddressList, insertAddress] =
@@ -92,6 +103,11 @@ export default function SupplierForm() {
       state.setList,
       state.insertAddress,
     ]);
+
+  const [contactList, setContactList] = useSupplierContactStore((state) => [
+    state.contactList,
+    state.setList,
+  ]);
 
   const [registryData, action, closeForm] = useRegistryFormStore((state) => [
     state.registryData,
@@ -117,6 +133,15 @@ export default function SupplierForm() {
     setAdressFormAction(action);
     setSelectedAddress(cellData);
     setAdressFormOpen(true);
+  };
+
+  const openContactForm = (
+    cellData: tRegistryColumnDef | null,
+    action: tRegistryAction,
+  ) => {
+    setContactFormAction(action);
+    setSelectedContact(cellData);
+    setContactFormOpen(true);
   };
 
   const addressColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
@@ -167,6 +192,68 @@ export default function SupplierForm() {
                       type="button"
                       icon={<BiBlock />}
                       onClick={() => openAddressForm(cellData, 'delete')}
+                    >
+                      Desativar
+                    </MenuItem>
+                  </>
+                )}
+              </MenuList>
+            </Menu>
+          );
+        },
+      },
+    ],
+    [],
+  );
+
+  const contactColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
+    () => [
+      ...supplierContactTableColumns,
+      {
+        id: 'actionButtons',
+        header: 'Ações',
+        cell: ({ cell }) => {
+          const cellData = cell.row.original;
+          return (
+            <Menu>
+              <MenuButton
+                variant="tableMenu"
+                as={IconButton}
+                icon={<FaEllipsisVertical />}
+              />
+              <MenuList fontFamily="button" fontWeight="700">
+                <MenuItem
+                  fontFamily="button"
+                  fontWeight="500"
+                  fontSize="12px"
+                  color="text.standard"
+                  icon={<ViewIcon />}
+                  type="button"
+                  onClick={() => openContactForm(cellData, 'view')}
+                >
+                  Visualizar
+                </MenuItem>
+                {(action === 'edit' || action === 'insert') && (
+                  <>
+                    <MenuItem
+                      fontFamily="button"
+                      fontWeight="500"
+                      fontSize="12px"
+                      color="text.standard"
+                      type="button"
+                      icon={<EditIcon />}
+                      onClick={() => openContactForm(cellData, 'edit')}
+                    >
+                      Editar
+                    </MenuItem>
+                    <MenuItem
+                      fontFamily="button"
+                      fontWeight="500"
+                      fontSize="12px"
+                      color="text.standard"
+                      type="button"
+                      icon={<BiBlock />}
+                      onClick={() => openContactForm(cellData, 'delete')}
                     >
                       Desativar
                     </MenuItem>
@@ -257,6 +344,7 @@ export default function SupplierForm() {
           ...data,
           ...(action === 'insert' && {
             addresses: addressList,
+            contacts: contactList,
           }),
         }),
         cache: 'no-store',
@@ -368,6 +456,13 @@ export default function SupplierForm() {
     getSortedRowModel: getSortedRowModel(),
   });
 
+  const contactTable = useReactTable({
+    columns: contactColumns,
+    data: contactList,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
   useEffect(() => {
     startProcessingSpinner();
     if (!registryData && action === 'insert') {
@@ -418,6 +513,18 @@ export default function SupplierForm() {
           console.error(`FETCH ERROR: ${error}`);
           throw error;
         }),
+      // CONTATOS
+      fetchApp({
+        endpoint: `/api/internal/suppliers/${rowData.data.id}/contacts`,
+        baseUrl: window.location.origin,
+      })
+        .then((result) => {
+          setContactList(result.body);
+        })
+        .catch((error) => {
+          console.error(`FETCH ERROR: ${error}`);
+          throw error;
+        }),
     ]).then(() => stopProcessingSpinner());
   }, []);
 
@@ -430,6 +537,15 @@ export default function SupplierForm() {
           isFormOpen={isAdressFormOpen}
           setIsFormOpen={setAdressFormOpen}
           addressData={selectedAddress}
+          supplierData={supplierData}
+        />
+      )}
+      {isContactFormOpen && (
+        <SupplierContactForm
+          formAction={contactFormAction}
+          isFormOpen={isContactFormOpen}
+          setIsFormOpen={setContactFormOpen}
+          contactData={selectedContact}
           supplierData={supplierData}
         />
       )}
@@ -501,6 +617,7 @@ export default function SupplierForm() {
           <TabList>
             <Tab>Principal</Tab>
             <Tab>Endereços</Tab>
+            <Tab>Contatos</Tab>
           </TabList>
           <TabPanels>
             {/* PRINCIPAL */}
@@ -740,6 +857,84 @@ export default function SupplierForm() {
                   </Thead>
                   <Tbody>
                     {addressTable.getRowModel().rows.map((row) => (
+                      <Tr key={row.id}>
+                        {row.getVisibleCells().map((cell) => {
+                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                          const meta: any = cell.column.columnDef.meta;
+                          const rowData: any = row.original;
+                          return (
+                            <Td
+                              key={cell.id}
+                              isNumeric={meta?.isNumeric}
+                              color={
+                                rowData.isActive ? 'text.standard' : 'gray.400'
+                              }
+                            >
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </Td>
+                          );
+                        })}
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Flex>
+            </TabPanel>
+            {/* CONTATOS */}
+            <TabPanel>
+              <Flex
+                alignItems="left"
+                justifyContent="flexStart"
+                flexDirection="column"
+                padding={4}
+                gap={2}
+              >
+                {(action === 'insert' || action === 'edit') && (
+                  <Button
+                    // eslint-disable-next-line react/jsx-no-undef
+                    leftIcon={<AddIcon />}
+                    variant="primaryOutline"
+                    onClick={() => openContactForm(null, 'insert')}
+                    maxW={24}
+                    type="button"
+                  >
+                    Incluir
+                  </Button>
+                )}
+
+                <Table
+                  size="sm"
+                  variant="registryExport"
+                  maxWidth="100%"
+                  mt={4}
+                >
+                  <Thead>
+                    {contactTable.getHeaderGroups().map((headerGroup) => (
+                      <Tr key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => {
+                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                          const meta: any = header.column.columnDef.meta;
+                          return (
+                            <Th
+                              key={header.id}
+                              onClick={header.column.getToggleSortingHandler()}
+                              isNumeric={meta?.isNumeric}
+                            >
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                            </Th>
+                          );
+                        })}
+                      </Tr>
+                    ))}
+                  </Thead>
+                  <Tbody>
+                    {contactTable.getRowModel().rows.map((row) => (
                       <Tr key={row.id}>
                         {row.getVisibleCells().map((cell) => {
                           // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
