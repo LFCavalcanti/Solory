@@ -41,11 +41,6 @@ export const companyMenu: iMenuItem[] = [
     label: 'Fornecedores',
     destination: '/client/suppliers',
   },
-  {
-    key: 'supplierContacts',
-    label: 'Contatos Fornecedor',
-    destination: '/client/supplierscontacts',
-  },
 ];
 
 export const customerMenu: iMenuItem[] = [
@@ -53,11 +48,6 @@ export const customerMenu: iMenuItem[] = [
     key: 'customers',
     label: 'Clientes',
     destination: '/client/customers',
-  },
-  {
-    key: 'customerContacts',
-    label: 'Contatos Cliente',
-    destination: '/client/customercontacts',
   },
   {
     key: 'projects',
