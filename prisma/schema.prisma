@@ -93,6 +93,7 @@ model CompanyGroup {
   users           UserToCompanyGroup[]
   products        Product[]
   suppliers       Supplier[]
+  simplesNacConfigs SimplesNacConfig[]
 }
 
 model UserToCompanyGroup {
@@ -126,7 +127,7 @@ model Company {
   users        UserToCompany[]
   adresses     CompanyAddress[]
   companyCnaeIss CompanyCnaeIss[]
-  simplesNacConfigs simplesNacConfig[]
+  simplesNacConfigs SimplesNacConfig[]
   suppliers Supplier[]
   products Product[]
 
@@ -216,18 +217,28 @@ model cities {
   @@index([state, code])
 }
 
-model simplesNacConfig {
+model SimplesNacConfig {
   id  String @id @default(cuid())
+  isActive Boolean @default(true)
   createdAt DateTime
-  expiredAt DateTime?
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId String
+  disabledAt DateTime?
+  activeSince DateTime
+  expiresAt DateTime?
   cnaeCode String @db.VarChar(7)
   anexoSimples String
   isEligibleRFactor Boolean
   rFactor Float
   aliquotStandard Float
   aliquotRFactor Float
+  anexoSimplesFatorR String?
+  floorRevenue Float
+  ceilRevenue Float
+  company         Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  companyGroup         CompanyGroup     @relation(fields: [companyGroupId], references: [id], onDelete: Cascade)
+  companyGroupId String
+  @@unique([isActive, companyId, anexoSimples, expiresAt])
+  @@index([isActive, companyGroupId, companyId, anexoSimples, isEligibleRFactor])
 }
 
 model Supplier {
