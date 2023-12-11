@@ -24,6 +24,7 @@
     "@sendgrid/mail": "^7.7.0",
     "@tanstack/react-table": "^8.10.6",
     "bcrypt": "^5.1.1",
+    "chakra-react-select": "^4.7.6",
     "framer-motion": "^10.16.4",
     "jose": "^4.15.3",
     "lodash.debounce": "^4.0.8",
