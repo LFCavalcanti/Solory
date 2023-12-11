@@ -29,11 +29,6 @@ export async function GET(request: NextRequest) {
         description: 'asc',
       },
     }),
-    ...(orderBy === 'type' && {
-      orderBy: {
-        type: 'asc',
-      },
-    }),
   });
 
   if (!productTypes) {

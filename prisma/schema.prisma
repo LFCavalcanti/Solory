@@ -94,7 +94,6 @@ model CompanyGroup {
   products        Product[]
   suppliers       Supplier[]
   simplesNacConfigs SimplesNacConfig[]
-  contractTypes   ContractType[]
   customers       Customer[]
 }
 
@@ -132,8 +131,8 @@ model Company {
   simplesNacConfigs SimplesNacConfig[]
   suppliers Supplier[]
   products Product[]
-  contractTypes ContractType[]
   customers       Customer[]
+  contracts Contract[]
 
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
@@ -204,6 +203,7 @@ model Product {
   @@index([companyId, code])
   @@index([companyGroupId, code])
   @@index([companyGroupId, companyId, code])
+  contractItems ContractItem[]
 }
 
 model productType {
@@ -304,20 +304,42 @@ model SupplierContact {
   supplier   Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
 }
 
-model ContractType {
+model Contract {
   id  String @id @default(cuid())
   isActive     Boolean @default(true)
   createdAt       DateTime
   disabledAt      DateTime?
+  termStart DateTime
+  termEnd DateTime?
+  termDuration Int
   description String
-  //recorrencia(fatura, fixo, avulso)
-  //medicao (eventual, semanal, mensal)
-  //tipo (Pacote de Horas/Produtos, Projeto, Demanda)
+  recurrence String
+  measureType String
+  contractType String
+  paymentType String
+  paymentTerm Int
+  invoiceClosureDay Int?
+  autoRenewal Boolean @default(false)
+  renewalPriceIndex String @db.VarChar(10)
+  generalNotes String
   company         Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
-  companyGroup         CompanyGroup     @relation(fields: [companyGroupId], references: [id], onDelete: Cascade)
-  companyGroupId String
+  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String
+  items    ContractItem[]
+}
 
+model ContractItem {
+  id  String @id @default(cuid())
+  isActive     Boolean @default(true)
+  description String
+  itemType String
+  quantity Float
+  price Float
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId String
 }
 
 model Customer {
@@ -339,6 +361,7 @@ model Customer {
   companyGroupId String
   adresses     CustomerAddress[]
   contacts    CustomerContact[]
+  contracts Contract[]
 
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
