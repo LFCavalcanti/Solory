@@ -148,7 +148,7 @@ export default function ProductForm() {
       });
       // PRODUCT TYPE LIST
       fetchApp({
-        endpoint: `/api/internal/products/producttypes?orderBy=type`,
+        endpoint: `/api/internal/products/producttypes?orderBy=id`,
         baseUrl: window.location.origin,
         cache: 'no-store',
       })
