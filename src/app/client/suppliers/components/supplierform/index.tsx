@@ -53,21 +53,21 @@ import { tRegistryAction } from '@/types/tRegistryAction';
 import { MdOutlineWidgets } from 'react-icons/md';
 import { z } from 'zod';
 import {
-  customerTableRow,
-  customerValidate,
-  tCustomer,
-} from '@/types/Customer/tCustomer';
-import { tCustomerAddress } from '@/types/Customer/tCustomerAddress';
-import { useCustomerAddressesStore } from '@/lib/hooks/state/useCustomerAddressesStore';
+  supplierTableRow,
+  supplierValidate,
+  tSupplier,
+} from '@/types/Supplier/tSupplier';
+import { tSupplierAddress } from '@/types/Supplier/tSupplierAddress';
+import { useSupplierAddressesStore } from '@/lib/hooks/state/useSupplierAddressesStore';
 import {
-  customerAddressTableColumns,
-  customerContactTableColumns,
-} from '../registerFields';
-import CustomerAddressForm from '../customerAddressForm';
-import { useCustomerContactStore } from '@/lib/hooks/state/useCustomerContactStore';
-import CustomerContactForm from '../customercontactform';
+  supplierAddressTableColumns,
+  supplierContactTableColumns,
+} from '../../registerFields';
+import SupplierAddressForm from '../supplierAddressForm';
+import { useSupplierContactStore } from '@/lib/hooks/state/useSupplierContactStore';
+import SupplierContactForm from '../suppliercontactform';
 
-export default function CustomerForm() {
+export default function SupplierForm() {
   const router = useRouter();
 
   const [startProcessingSpinner, stopProcessingSpinner] =
@@ -87,24 +87,24 @@ export default function CustomerForm() {
   const [adressFormAction, setAdressFormAction] =
     useState<tRegistryAction>(null);
   const [selectedAddress, setSelectedAddress] =
-    useState<tCustomerAddress | null>(null);
+    useState<tSupplierAddress | null>(null);
 
   const [isContactFormOpen, setContactFormOpen] = useState(false);
   const [contactFormAction, setContactFormAction] =
     useState<tRegistryAction>(null);
   const [selectedContact, setSelectedContact] =
-    useState<tCustomerAddress | null>(null);
+    useState<tSupplierAddress | null>(null);
 
-  const [customerData, setCustomerData] = useState<tCustomer>();
+  const [supplierData, setSupplierData] = useState<tSupplier>();
 
   const [addressList, setAddressList, insertAddress] =
-    useCustomerAddressesStore((state) => [
+    useSupplierAddressesStore((state) => [
       state.addressList,
       state.setList,
       state.insertAddress,
     ]);
 
-  const [contactList, setContactList] = useCustomerContactStore((state) => [
+  const [contactList, setContactList] = useSupplierContactStore((state) => [
     state.contactList,
     state.setList,
   ]);
@@ -122,8 +122,8 @@ export default function CustomerForm() {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<tCustomer>({
-    resolver: zodResolver(customerValidate),
+  } = useForm<tSupplier>({
+    resolver: zodResolver(supplierValidate),
   });
 
   const openAddressForm = (
@@ -146,7 +146,7 @@ export default function CustomerForm() {
 
   const addressColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
     () => [
-      ...customerAddressTableColumns,
+      ...supplierAddressTableColumns,
       {
         id: 'actionButtons',
         header: 'Ações',
@@ -208,7 +208,7 @@ export default function CustomerForm() {
 
   const contactColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
     () => [
-      ...customerContactTableColumns,
+      ...supplierContactTableColumns,
       {
         id: 'actionButtons',
         header: 'Ações',
@@ -268,7 +268,7 @@ export default function CustomerForm() {
     [],
   );
 
-  const submitCustomer: SubmitHandler<tCustomer> = async (data) => {
+  const submitSupplier: SubmitHandler<tSupplier> = async (data) => {
     if (action === 'view') {
       closeForm();
       return;
@@ -309,7 +309,7 @@ export default function CustomerForm() {
         updatedData = await fetchApp({
           method: 'PUT',
           baseUrl: window.location.origin,
-          endpoint: `/api/internal/customers/${registryId}`,
+          endpoint: `/api/internal/suppliers/${registryId}`,
           body: JSON.stringify({ isActive: false }),
           cache: 'no-store',
         });
@@ -318,7 +318,7 @@ export default function CustomerForm() {
       } catch (error) {
         console.error(error);
         toast({
-          title: `Erro ao desativar o cliente "${data.aliasName}"`,
+          title: `Erro ao desativar o fornecedor "${data.aliasName}"`,
           status: 'error',
         });
         return;
@@ -338,8 +338,8 @@ export default function CustomerForm() {
         baseUrl: window.location.origin,
         endpoint:
           action === 'insert'
-            ? '/api/internal/customers'
-            : `/api/internal/customers/${registryId}`,
+            ? '/api/internal/suppliers'
+            : `/api/internal/suppliers/${registryId}`,
         body: JSON.stringify({
           ...data,
           ...(action === 'insert' && {
@@ -355,8 +355,8 @@ export default function CustomerForm() {
       console.error(error);
       const message =
         action === 'insert'
-          ? `Erro ao incluir cliente "${data.aliasName}"`
-          : `Erro ao editar cliente "${data.aliasName}"`;
+          ? `Erro ao incluir fornecedor "${data.aliasName}"`
+          : `Erro ao editar fornecedor "${data.aliasName}"`;
       toast({
         title: message,
         status: 'error',
@@ -366,8 +366,8 @@ export default function CustomerForm() {
     toast({
       title:
         action === 'insert'
-          ? `Cliente "${data.aliasName}" incluida com sucesso`
-          : `Cliente "${data.aliasName}" editada com sucesso`,
+          ? `Fornecedor "${data.aliasName}" incluida com sucesso`
+          : `Fornecedor "${data.aliasName}" editada com sucesso`,
       status: 'success',
     });
     closeForm();
@@ -413,7 +413,7 @@ export default function CustomerForm() {
 
     const companyApiData = await apiDataReturn.json();
 
-    const companyMainData: tCustomer = {
+    const companyMainData: tSupplier = {
       isActive: true,
       aliasName: String(companyApiData.razao_social).slice(0, 60),
       fullName: companyApiData.razao_social,
@@ -429,7 +429,7 @@ export default function CustomerForm() {
       phone: companyApiData.ddd_telefone_1,
     };
 
-    const companyMainAddress: tCustomerAddress = {
+    const companyMainAddress: tSupplierAddress = {
       isActive: true,
       isMainAddress: true,
       street: `${companyApiData.descricao_tipo_de_logradouro} ${companyApiData.logradouro}`,
@@ -441,7 +441,7 @@ export default function CustomerForm() {
       cityCode: String(companyApiData.codigo_municipio_ibge),
     };
 
-    setCustomerData(companyMainData);
+    setSupplierData(companyMainData);
     reset(companyMainData);
 
     setAddressList([]);
@@ -474,13 +474,13 @@ export default function CustomerForm() {
     }
     if (!registryData && action !== 'insert') {
       stopProcessingSpinner();
-      throw new Error('Must provide Customer data');
+      throw new Error('Must provide Supplier data');
     }
 
-    const rowData = customerTableRow.safeParse(registryData);
+    const rowData = supplierTableRow.safeParse(registryData);
 
     if (!rowData.success)
-      throw new Error('Customer data type validation failed');
+      throw new Error('Supplier data type validation failed');
 
     setRegistryId(rowData.data.id);
     setRegistryCreatedAt(rowData.data.createdAt);
@@ -488,14 +488,14 @@ export default function CustomerForm() {
     Promise.all([
       // PRINCIPAL
       fetchApp({
-        endpoint: `/api/internal/customers/${rowData.data.id}`,
+        endpoint: `/api/internal/suppliers/${rowData.data.id}`,
         baseUrl: window.location.origin,
       })
         .then((result) => {
           reset({
             ...result.body,
           });
-          setCustomerData(result.body);
+          setSupplierData(result.body);
         })
         .catch((error) => {
           console.error(`FETCH ERROR: ${error}`);
@@ -503,7 +503,7 @@ export default function CustomerForm() {
         }),
       // ENDEREÇOS
       fetchApp({
-        endpoint: `/api/internal/customers/${rowData.data.id}/addresses`,
+        endpoint: `/api/internal/suppliers/${rowData.data.id}/addresses`,
         baseUrl: window.location.origin,
       })
         .then((result) => {
@@ -515,7 +515,7 @@ export default function CustomerForm() {
         }),
       // CONTATOS
       fetchApp({
-        endpoint: `/api/internal/customers/${rowData.data.id}/contacts`,
+        endpoint: `/api/internal/suppliers/${rowData.data.id}/contacts`,
         baseUrl: window.location.origin,
       })
         .then((result) => {
@@ -528,25 +528,25 @@ export default function CustomerForm() {
     ]).then(() => stopProcessingSpinner());
   }, []);
 
-  const title = getTitleByAction('CLIENTE', action);
+  const title = getTitleByAction('FORNECEDOR', action);
   return (
     <Flex direction="column" padding={4} gap={3} height="100%" width="100%">
       {isAdressFormOpen && (
-        <CustomerAddressForm
+        <SupplierAddressForm
           formAction={adressFormAction}
           isFormOpen={isAdressFormOpen}
           setIsFormOpen={setAdressFormOpen}
           addressData={selectedAddress}
-          customerData={customerData}
+          supplierData={supplierData}
         />
       )}
       {isContactFormOpen && (
-        <CustomerContactForm
+        <SupplierContactForm
           formAction={contactFormAction}
           isFormOpen={isContactFormOpen}
           setIsFormOpen={setContactFormOpen}
           contactData={selectedContact}
-          customerData={customerData}
+          supplierData={supplierData}
         />
       )}
       <Heading
@@ -612,7 +612,7 @@ export default function CustomerForm() {
           </Button>
         </Flex>
       )}
-      <form onSubmit={handleSubmit(submitCustomer)}>
+      <form onSubmit={handleSubmit(submitSupplier)}>
         <Tabs variant="registryTabs">
           <TabList>
             <Tab>Principal</Tab>

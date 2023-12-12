@@ -1,7 +1,7 @@
 import RegisterPage from '@/components/RegisterPage';
-import disableBulkSimplesNacConfig from '@/components/registers/simplesNacConfig/disableBulkSimplesNacConfig';
-import { simplesNacConfigTableColumns } from '@/components/registers/simplesNacConfig/registerFields';
-import SimplesNacConfigForm from '@/components/registers/simplesNacConfig/simplesNacConfigForm';
+import disableBulkSimplesNacConfig from '@/app/client/simplesnacconfig/disableBulkSimplesNacConfig';
+import { simplesNacConfigTableColumns } from '@/app/client/simplesnacconfig/registerFields';
+import SimplesNacConfigForm from '@/app/client/simplesnacconfig/components/simplesNacConfigForm';
 import fetchApp from '@/lib/fetchApp';
 import { tSimplesNacConfig } from '@/types/SimplesNacConfig/tSimplesNacConfig';
 import { headers } from 'next/headers';

@@ -65,7 +65,7 @@ import {
 } from '@/types/Contract/tContract';
 import { tContractItem } from '@/types/Contract/tContractItem';
 import { useContractItemStore } from '@/lib/hooks/state/useContractItemStore';
-import { contractItemTableColumns } from '../registerFields';
+import { contractItemTableColumns } from '../../registerFields';
 import ContractItemForm from '../contractItemForm';
 import { Select as AltSelect, ChakraStylesConfig } from 'chakra-react-select';
 import { tCustomer } from '@/types/Customer/tCustomer';

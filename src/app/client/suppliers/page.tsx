@@ -2,9 +2,9 @@ import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
 import { headers } from 'next/headers';
 import { tSupplier } from '@/types/Supplier/tSupplier';
-import disableBulkSupplier from '@/components/registers/supplier/disableBulkSupplier';
-import { supplierTableColumns } from '@/components/registers/supplier/registerFields';
-import SupplierForm from '@/components/registers/supplier/supplierform';
+import disableBulkSupplier from '@/app/client/suppliers/disableBulkSupplier';
+import { supplierTableColumns } from '@/app/client/suppliers/registerFields';
+import SupplierForm from '@/app/client/suppliers/components/supplierform';
 
 const getSuppliers = async (): Promise<tSupplier[]> => {
   try {

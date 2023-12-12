@@ -2,9 +2,9 @@ import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
 import { headers } from 'next/headers';
 import { tCustomer } from '@/types/Customer/tCustomer';
-import disableBulkCustomer from '@/components/registers/customer/disableBulkCustomer';
-import { customerTableColumns } from '@/components/registers/customer/registerFields';
-import CustomerForm from '@/components/registers/customer/customerform';
+import disableBulkCustomer from '@/app/client/customers/disableBulkCustomer';
+import { customerTableColumns } from '@/app/client/customers/registerFields';
+import CustomerForm from '@/app/client/customers/components/customerform';
 
 const getCustomers = async (): Promise<tCustomer[]> => {
   try {

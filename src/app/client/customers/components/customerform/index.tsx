@@ -18,7 +18,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Select,
   Switch,
   Tab,
   TabList,
@@ -40,38 +39,35 @@ import { useRouter } from 'next/navigation';
 import { tFechAppReturn } from '@/types/tFechAppReturn';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 import {
-  companyTableRow,
-  companyValidate,
-  tCompany,
-} from '@/types/Company/tCompany';
-import { tCompanyAddress } from '@/types/Company/tCompanyAddress';
-import { tCompanyCnaeIss } from '@/types/Company/tCompanyCnaeIss';
-import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import {
-  companyAddressTableColumns,
-  companyCnaeIssTableColumns,
-} from '../registerFields';
 import { AddIcon, EditIcon, ViewIcon } from '@chakra-ui/icons';
 import { tRegistryColumnDef } from '@/types/tRegistryColumnDef';
 import { FaEllipsisVertical } from 'react-icons/fa6';
 import { BiBlock } from 'react-icons/bi';
 import { tRegistryAction } from '@/types/tRegistryAction';
-import CompanyAddressForm from '../companyAddressForm';
-import CompanyCnaeIssForm from '../companyCnaeIssForm';
-import { useCompanyAddressesStore } from '@/lib/hooks/state/useCompanyAddressesStore';
-import { useCompanyCnaeIssStore } from '@/lib/hooks/state/useCompanyCnaeIssStore';
 import { MdOutlineWidgets } from 'react-icons/md';
 import { z } from 'zod';
-import { tCompanyGroup } from '@/types/CompanyGroup/tCompanyGroup';
-import { tFormSelectOptionList } from '@/types/tFormSelectOptions';
+import {
+  customerTableRow,
+  customerValidate,
+  tCustomer,
+} from '@/types/Customer/tCustomer';
+import { tCustomerAddress } from '@/types/Customer/tCustomerAddress';
+import { useCustomerAddressesStore } from '@/lib/hooks/state/useCustomerAddressesStore';
+import {
+  customerAddressTableColumns,
+  customerContactTableColumns,
+} from '../../registerFields';
+import CustomerAddressForm from '../customerAddressForm';
+import { useCustomerContactStore } from '@/lib/hooks/state/useCustomerContactStore';
+import CustomerContactForm from '../customercontactform';
 
-export default function CompanyForm() {
+export default function CustomerForm() {
   const router = useRouter();
 
   const [startProcessingSpinner, stopProcessingSpinner] =
@@ -91,24 +87,25 @@ export default function CompanyForm() {
   const [adressFormAction, setAdressFormAction] =
     useState<tRegistryAction>(null);
   const [selectedAddress, setSelectedAddress] =
-    useState<tCompanyAddress | null>(null);
+    useState<tCustomerAddress | null>(null);
 
-  const [isCnaeIssFormOpen, setCnaeIssFormOpen] = useState(false);
-  const [cnaeIssFormAction, setCnaeIssFormAction] =
+  const [isContactFormOpen, setContactFormOpen] = useState(false);
+  const [contactFormAction, setContactFormAction] =
     useState<tRegistryAction>(null);
-  const [selectedCnaeIss, setSelectedCnaeIss] =
-    useState<tCompanyCnaeIss | null>(null);
+  const [selectedContact, setSelectedContact] =
+    useState<tCustomerAddress | null>(null);
 
-  const [companyData, setCompanyData] = useState<tCompany>();
-  const [companyGroupsList, setCompanyGroupsList] =
-    useState<tFormSelectOptionList>([]);
+  const [customerData, setCustomerData] = useState<tCustomer>();
 
-  const [addressList, setAddressList, insertAddress] = useCompanyAddressesStore(
-    (state) => [state.addressList, state.setList, state.insertAddress],
-  );
+  const [addressList, setAddressList, insertAddress] =
+    useCustomerAddressesStore((state) => [
+      state.addressList,
+      state.setList,
+      state.insertAddress,
+    ]);
 
-  const [cnaeIssList, setCnaeIssList] = useCompanyCnaeIssStore((state) => [
-    state.cnaeIssList,
+  const [contactList, setContactList] = useCustomerContactStore((state) => [
+    state.contactList,
     state.setList,
   ]);
 
@@ -125,8 +122,8 @@ export default function CompanyForm() {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<tCompany>({
-    resolver: zodResolver(companyValidate),
+  } = useForm<tCustomer>({
+    resolver: zodResolver(customerValidate),
   });
 
   const openAddressForm = (
@@ -138,18 +135,18 @@ export default function CompanyForm() {
     setAdressFormOpen(true);
   };
 
-  const openCnaeIssForm = (
+  const openContactForm = (
     cellData: tRegistryColumnDef | null,
     action: tRegistryAction,
   ) => {
-    setCnaeIssFormAction(action);
-    setSelectedCnaeIss(cellData);
-    setCnaeIssFormOpen(true);
+    setContactFormAction(action);
+    setSelectedContact(cellData);
+    setContactFormOpen(true);
   };
 
   const addressColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
     () => [
-      ...companyAddressTableColumns,
+      ...customerAddressTableColumns,
       {
         id: 'actionButtons',
         header: 'Ações',
@@ -209,9 +206,9 @@ export default function CompanyForm() {
     [],
   );
 
-  const cnaeIssColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
+  const contactColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
     () => [
-      ...companyCnaeIssTableColumns,
+      ...customerContactTableColumns,
       {
         id: 'actionButtons',
         header: 'Ações',
@@ -230,9 +227,9 @@ export default function CompanyForm() {
                   fontWeight="500"
                   fontSize="12px"
                   color="text.standard"
-                  type="button"
                   icon={<ViewIcon />}
-                  onClick={() => openCnaeIssForm(cellData, 'view')}
+                  type="button"
+                  onClick={() => openContactForm(cellData, 'view')}
                 >
                   Visualizar
                 </MenuItem>
@@ -245,7 +242,7 @@ export default function CompanyForm() {
                       color="text.standard"
                       type="button"
                       icon={<EditIcon />}
-                      onClick={() => openCnaeIssForm(cellData, 'edit')}
+                      onClick={() => openContactForm(cellData, 'edit')}
                     >
                       Editar
                     </MenuItem>
@@ -256,7 +253,7 @@ export default function CompanyForm() {
                       color="text.standard"
                       type="button"
                       icon={<BiBlock />}
-                      onClick={() => openCnaeIssForm(cellData, 'delete')}
+                      onClick={() => openContactForm(cellData, 'delete')}
                     >
                       Desativar
                     </MenuItem>
@@ -271,7 +268,7 @@ export default function CompanyForm() {
     [],
   );
 
-  const submitCompany: SubmitHandler<tCompany> = async (data) => {
+  const submitCustomer: SubmitHandler<tCustomer> = async (data) => {
     if (action === 'view') {
       closeForm();
       return;
@@ -307,20 +304,12 @@ export default function CompanyForm() {
       return;
     }
 
-    if (!cnaeIssList || cnaeIssList.length < 1) {
-      toast({
-        title: `Deve manter pelo menos um CNAE vs ISS`,
-        status: 'error',
-      });
-      return;
-    }
-
     if (action === 'delete') {
       try {
         updatedData = await fetchApp({
           method: 'PUT',
           baseUrl: window.location.origin,
-          endpoint: `/api/internal/companies/${registryId}`,
+          endpoint: `/api/internal/customers/${registryId}`,
           body: JSON.stringify({ isActive: false }),
           cache: 'no-store',
         });
@@ -329,7 +318,7 @@ export default function CompanyForm() {
       } catch (error) {
         console.error(error);
         toast({
-          title: `Erro ao desativar a empresa "${data.aliasName}"`,
+          title: `Erro ao desativar o cliente "${data.aliasName}"`,
           status: 'error',
         });
         return;
@@ -349,13 +338,13 @@ export default function CompanyForm() {
         baseUrl: window.location.origin,
         endpoint:
           action === 'insert'
-            ? '/api/internal/companies'
-            : `/api/internal/companies/${registryId}`,
+            ? '/api/internal/customers'
+            : `/api/internal/customers/${registryId}`,
         body: JSON.stringify({
           ...data,
           ...(action === 'insert' && {
             addresses: addressList,
-            cnaeIss: cnaeIssList,
+            contacts: contactList,
           }),
         }),
         cache: 'no-store',
@@ -366,8 +355,8 @@ export default function CompanyForm() {
       console.error(error);
       const message =
         action === 'insert'
-          ? `Erro ao incluir empresa "${data.aliasName}"`
-          : `Erro ao editar empresa "${data.aliasName}"`;
+          ? `Erro ao incluir cliente "${data.aliasName}"`
+          : `Erro ao editar cliente "${data.aliasName}"`;
       toast({
         title: message,
         status: 'error',
@@ -377,8 +366,8 @@ export default function CompanyForm() {
     toast({
       title:
         action === 'insert'
-          ? `Empresa "${data.aliasName}" incluida com sucesso`
-          : `Empresa "${data.aliasName}" editada com sucesso`,
+          ? `Cliente "${data.aliasName}" incluida com sucesso`
+          : `Cliente "${data.aliasName}" editada com sucesso`,
       status: 'success',
     });
     closeForm();
@@ -392,7 +381,7 @@ export default function CompanyForm() {
     const cnpjValidator = z
       .string()
       .trim()
-      .nonempty()
+      .min(1)
       .regex(/\d{14}/)
       .max(14);
 
@@ -424,12 +413,11 @@ export default function CompanyForm() {
 
     const companyApiData = await apiDataReturn.json();
 
-    const companyMainData: tCompany = {
+    const companyMainData: tCustomer = {
       isActive: true,
       aliasName: String(companyApiData.razao_social).slice(0, 60),
       fullName: companyApiData.razao_social,
       cnpj: companyApiData.cnpj,
-      mainCnae: String(companyApiData.cnae_fiscal),
       isMei:
         companyApiData.opcao_pelo_mei == null
           ? false
@@ -441,7 +429,7 @@ export default function CompanyForm() {
       phone: companyApiData.ddd_telefone_1,
     };
 
-    const companyMainAddress: tCompanyAddress = {
+    const companyMainAddress: tCustomerAddress = {
       isActive: true,
       isMainAddress: true,
       street: `${companyApiData.descricao_tipo_de_logradouro} ${companyApiData.logradouro}`,
@@ -453,31 +441,11 @@ export default function CompanyForm() {
       cityCode: String(companyApiData.codigo_municipio_ibge),
     };
 
-    const companyMainCnaeIss: tCompanyCnaeIss = {
-      isActive: true,
-      cnaeCode: String(companyApiData.cnae_fiscal),
-      description: companyApiData.cnae_fiscal_descricao,
-    };
-
-    const secondaryCnaeIssList: tCompanyCnaeIss[] =
-      companyApiData.cnaes_secundarios.map(
-        (item: { codigo: string; descricao: string }) => {
-          return {
-            isActive: true,
-            cnaeCode: String(item.codigo),
-            description: item.descricao,
-          };
-        },
-      );
-
-    setCompanyData(companyMainData);
+    setCustomerData(companyMainData);
     reset(companyMainData);
 
     setAddressList([]);
     insertAddress(companyMainAddress);
-    setCnaeIssList([companyMainCnaeIss, ...secondaryCnaeIssList]);
-    //insertCnaeIss(companyCnaeIss);
-
     stopProcessingSpinner();
   };
 
@@ -488,9 +456,9 @@ export default function CompanyForm() {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const cnaeIssTable = useReactTable({
-    columns: cnaeIssColumns,
-    data: cnaeIssList,
+  const contactTable = useReactTable({
+    columns: contactColumns,
+    data: contactList,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
@@ -498,41 +466,21 @@ export default function CompanyForm() {
   useEffect(() => {
     startProcessingSpinner();
     if (!registryData && action === 'insert') {
-      fetchApp({
-        endpoint: `/api/internal/companygroups?onlyActive=true&orderBy=name`,
-        baseUrl: window.location.origin,
-        cache: 'no-store',
-      })
-        .then((result) => {
-          const companyGroups: tCompanyGroup[] = result.body;
-          const optionList = companyGroups.map((item) => {
-            return {
-              label: item.name || '',
-              value: item.id || '',
-            };
-          });
-          setCompanyGroupsList(optionList);
-          stopProcessingSpinner();
-        })
-        .catch((error) => {
-          console.error(`FETCH ERROR: ${error}`);
-          stopProcessingSpinner();
-          throw error;
-        });
       reset({
         isActive: true,
       });
+      stopProcessingSpinner();
       return;
     }
     if (!registryData && action !== 'insert') {
       stopProcessingSpinner();
-      throw new Error('Must provide Company data');
+      throw new Error('Must provide Customer data');
     }
 
-    const rowData = companyTableRow.safeParse(registryData);
+    const rowData = customerTableRow.safeParse(registryData);
 
     if (!rowData.success)
-      throw new Error('Company data type validation failed');
+      throw new Error('Customer data type validation failed');
 
     setRegistryId(rowData.data.id);
     setRegistryCreatedAt(rowData.data.createdAt);
@@ -540,14 +488,14 @@ export default function CompanyForm() {
     Promise.all([
       // PRINCIPAL
       fetchApp({
-        endpoint: `/api/internal/companies/${rowData.data.id}`,
+        endpoint: `/api/internal/customers/${rowData.data.id}`,
         baseUrl: window.location.origin,
       })
         .then((result) => {
           reset({
             ...result.body,
           });
-          setCompanyData(result.body);
+          setCustomerData(result.body);
         })
         .catch((error) => {
           console.error(`FETCH ERROR: ${error}`);
@@ -555,7 +503,7 @@ export default function CompanyForm() {
         }),
       // ENDEREÇOS
       fetchApp({
-        endpoint: `/api/internal/companies/${rowData.data.id}/addresses`,
+        endpoint: `/api/internal/customers/${rowData.data.id}/addresses`,
         baseUrl: window.location.origin,
       })
         .then((result) => {
@@ -565,33 +513,13 @@ export default function CompanyForm() {
           console.error(`FETCH ERROR: ${error}`);
           throw error;
         }),
-      // CNAE ISS
+      // CONTATOS
       fetchApp({
-        endpoint: `/api/internal/companies/${rowData.data.id}/cnaeiss`,
+        endpoint: `/api/internal/customers/${rowData.data.id}/contacts`,
         baseUrl: window.location.origin,
       })
         .then((result) => {
-          setCnaeIssList(result.body);
-        })
-        .catch((error) => {
-          console.error(`FETCH ERROR: ${error}`);
-          throw error;
-        }),
-      // COMPANY GROUP LIST
-      fetchApp({
-        endpoint: `/api/internal/companygroups?onlyActive=true&orderBy=name`,
-        baseUrl: window.location.origin,
-        cache: 'no-store',
-      })
-        .then((result) => {
-          const companyGroups: tCompanyGroup[] = result.body;
-          const optionList = companyGroups.map((item) => {
-            return {
-              label: item.name || '',
-              value: item.id || '',
-            };
-          });
-          setCompanyGroupsList(optionList);
+          setContactList(result.body);
         })
         .catch((error) => {
           console.error(`FETCH ERROR: ${error}`);
@@ -600,25 +528,25 @@ export default function CompanyForm() {
     ]).then(() => stopProcessingSpinner());
   }, []);
 
-  const title = getTitleByAction('EMPRESA', action);
+  const title = getTitleByAction('CLIENTE', action);
   return (
     <Flex direction="column" padding={4} gap={3} height="100%" width="100%">
       {isAdressFormOpen && (
-        <CompanyAddressForm
+        <CustomerAddressForm
           formAction={adressFormAction}
           isFormOpen={isAdressFormOpen}
           setIsFormOpen={setAdressFormOpen}
           addressData={selectedAddress}
-          companyData={companyData}
+          customerData={customerData}
         />
       )}
-      {isCnaeIssFormOpen && (
-        <CompanyCnaeIssForm
-          formAction={cnaeIssFormAction}
-          isFormOpen={isCnaeIssFormOpen}
-          setIsFormOpen={setCnaeIssFormOpen}
-          cnaeIssData={selectedCnaeIss}
-          companyData={companyData}
+      {isContactFormOpen && (
+        <CustomerContactForm
+          formAction={contactFormAction}
+          isFormOpen={isContactFormOpen}
+          setIsFormOpen={setContactFormOpen}
+          contactData={selectedContact}
+          customerData={customerData}
         />
       )}
       <Heading
@@ -684,54 +612,35 @@ export default function CompanyForm() {
           </Button>
         </Flex>
       )}
-      <form onSubmit={handleSubmit(submitCompany)}>
+      <form onSubmit={handleSubmit(submitCustomer)}>
         <Tabs variant="registryTabs">
           <TabList>
             <Tab>Principal</Tab>
-            <Tab>CNAE e ISS</Tab>
             <Tab>Endereços</Tab>
+            <Tab>Contatos</Tab>
           </TabList>
           <TabPanels>
             {/* PRINCIPAL */}
             <TabPanel>
               <Flex direction="column" gap={3}>
-                <FormControl isInvalid={errors.companyGroupId !== undefined}>
+                <FormControl isInvalid={errors.code !== undefined}>
                   <FormLabel fontSize="11px" color="text.standard">
-                    Grupo de Empresas:
+                    Código:
                   </FormLabel>
-                  <Controller
-                    control={control}
-                    name={'companyGroupId'}
-                    key={'companyGroupId'}
-                    defaultValue={''}
-                    rules={{ required: 'Selecione um grupo de empresas' }}
-                    render={({ field: { onChange, value, name, ref } }) => (
-                      <Select
-                        variant="outline"
-                        fontSize="12px"
-                        bg="backgroundLight"
-                        focusBorderColor="contrast.500"
-                        errorBorderColor="error"
-                        color="text.standard"
-                        placeholder="Selecione um grupo..."
-                        rounded={0}
-                        name={name}
-                        ref={ref}
-                        onChange={onChange}
-                        value={value}
-                        pointerEvents={action !== 'insert' ? 'none' : 'auto'}
-                      >
-                        {companyGroupsList.map((item) => (
-                          <option key={item.value} value={item.value}>
-                            {item.label}
-                          </option>
-                        ))}
-                      </Select>
-                    )}
+                  <Input
+                    type="text"
+                    variant="outline"
+                    fontSize="12px"
+                    placeholder="Código"
+                    bg="backgroundLight"
+                    focusBorderColor="contrast.500"
+                    errorBorderColor="error"
+                    color="text.standard"
+                    rounded={0}
+                    isReadOnly={action === 'view' || action === 'delete'}
+                    {...register('code')}
                   />
-                  <FormErrorMessage>
-                    {errors.companyGroupId?.message}
-                  </FormErrorMessage>
+                  <FormErrorMessage>{errors.code?.message}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={errors.aliasName !== undefined}>
@@ -818,50 +727,6 @@ export default function CompanyForm() {
                   <FormErrorMessage>{errors.phone?.message}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl isInvalid={errors.mainCnae !== undefined}>
-                  <FormLabel fontSize="11px" color="text.standard">
-                    CNAE Principal:
-                  </FormLabel>
-                  <Input
-                    type="text"
-                    variant="outline"
-                    fontSize="12px"
-                    placeholder="Código CNAE"
-                    bg="backgroundLight"
-                    focusBorderColor="contrast.500"
-                    errorBorderColor="error"
-                    color="text.standard"
-                    rounded={0}
-                    isReadOnly={action === 'view' || action === 'delete'}
-                    {...register('mainCnae')}
-                  />
-                  <FormErrorMessage>
-                    {errors.mainCnae?.message}
-                  </FormErrorMessage>
-                </FormControl>
-
-                <FormControl isInvalid={errors.mainIssCode !== undefined}>
-                  <FormLabel fontSize="11px" color="text.standard">
-                    Código ISS Principal:
-                  </FormLabel>
-                  <Input
-                    type="text"
-                    variant="outline"
-                    fontSize="12px"
-                    placeholder="Código ISS"
-                    bg="backgroundLight"
-                    focusBorderColor="contrast.500"
-                    errorBorderColor="error"
-                    color="text.standard"
-                    rounded={0}
-                    isReadOnly={action === 'view' || action === 'delete'}
-                    {...register('mainIssCode')}
-                  />
-                  <FormErrorMessage>
-                    {errors.mainIssCode?.message}
-                  </FormErrorMessage>
-                </FormControl>
-
                 <FormControl isInvalid={errors.isActive !== undefined}>
                   <FormLabel fontSize="11px" color="text.standard">
                     Ativo?
@@ -940,76 +805,6 @@ export default function CompanyForm() {
                 </Flex>
               </Flex>
             </TabPanel>
-            {/* CNAE ISS */}
-            <TabPanel>
-              <Flex
-                alignItems="left"
-                justifyContent="flexStart"
-                flexDirection="column"
-                padding={4}
-                gap={2}
-              >
-                {(action === 'insert' || action === 'edit') && (
-                  <Button
-                    // eslint-disable-next-line react/jsx-no-undef
-                    leftIcon={<AddIcon />}
-                    variant="primaryOutline"
-                    type="button"
-                    onClick={() => openCnaeIssForm(null, 'insert')}
-                    maxW={24}
-                  >
-                    Incluir
-                  </Button>
-                )}
-                <Table
-                  size="sm"
-                  variant="registryExport"
-                  maxWidth="100%"
-                  mt={4}
-                >
-                  <Thead>
-                    {cnaeIssTable.getHeaderGroups().map((headerGroup) => (
-                      <Tr key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => {
-                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-                          const meta: any = header.column.columnDef.meta;
-                          return (
-                            <Th
-                              key={header.id}
-                              onClick={header.column.getToggleSortingHandler()}
-                              isNumeric={meta?.isNumeric}
-                            >
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                            </Th>
-                          );
-                        })}
-                      </Tr>
-                    ))}
-                  </Thead>
-                  <Tbody>
-                    {cnaeIssTable.getRowModel().rows.map((row) => (
-                      <Tr key={row.id}>
-                        {row.getVisibleCells().map((cell) => {
-                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-                          const meta: any = cell.column.columnDef.meta;
-                          return (
-                            <Td key={cell.id} isNumeric={meta?.isNumeric}>
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )}
-                            </Td>
-                          );
-                        })}
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </Flex>
-            </TabPanel>
             {/* ENDEREÇOS */}
             <TabPanel>
               <Flex
@@ -1062,6 +857,84 @@ export default function CompanyForm() {
                   </Thead>
                   <Tbody>
                     {addressTable.getRowModel().rows.map((row) => (
+                      <Tr key={row.id}>
+                        {row.getVisibleCells().map((cell) => {
+                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                          const meta: any = cell.column.columnDef.meta;
+                          const rowData: any = row.original;
+                          return (
+                            <Td
+                              key={cell.id}
+                              isNumeric={meta?.isNumeric}
+                              color={
+                                rowData.isActive ? 'text.standard' : 'gray.400'
+                              }
+                            >
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </Td>
+                          );
+                        })}
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Flex>
+            </TabPanel>
+            {/* CONTATOS */}
+            <TabPanel>
+              <Flex
+                alignItems="left"
+                justifyContent="flexStart"
+                flexDirection="column"
+                padding={4}
+                gap={2}
+              >
+                {(action === 'insert' || action === 'edit') && (
+                  <Button
+                    // eslint-disable-next-line react/jsx-no-undef
+                    leftIcon={<AddIcon />}
+                    variant="primaryOutline"
+                    onClick={() => openContactForm(null, 'insert')}
+                    maxW={24}
+                    type="button"
+                  >
+                    Incluir
+                  </Button>
+                )}
+
+                <Table
+                  size="sm"
+                  variant="registryExport"
+                  maxWidth="100%"
+                  mt={4}
+                >
+                  <Thead>
+                    {contactTable.getHeaderGroups().map((headerGroup) => (
+                      <Tr key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => {
+                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                          const meta: any = header.column.columnDef.meta;
+                          return (
+                            <Th
+                              key={header.id}
+                              onClick={header.column.getToggleSortingHandler()}
+                              isNumeric={meta?.isNumeric}
+                            >
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                            </Th>
+                          );
+                        })}
+                      </Tr>
+                    ))}
+                  </Thead>
+                  <Tbody>
+                    {contactTable.getRowModel().rows.map((row) => (
                       <Tr key={row.id}>
                         {row.getVisibleCells().map((cell) => {
                           // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly

@@ -1,9 +1,9 @@
 import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
 import { headers } from 'next/headers';
-import { contractTableColumns } from '@/components/registers/contract/registerFields';
-import ContractForm from '@/components/registers/contract/contractform';
-import disableBulkContract from '@/components/registers/contract/disableBulkContract';
+import { contractTableColumns } from '@/app/client/contracts/registerFields';
+import ContractForm from '@/app/client/contracts/components/contractform';
+import disableBulkContract from '@/app/client/contracts/disableBulkContract';
 import { tContract } from '@/types/Contract/tContract';
 
 const getContracts = async (): Promise<tContract[]> => {

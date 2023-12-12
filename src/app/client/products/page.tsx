@@ -2,9 +2,9 @@ import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
 import { headers } from 'next/headers';
 import { tProduct } from '@/types/Product/tProduct';
-import { productTableColumns } from '@/components/registers/product/registerFields';
-import disableBulkProduct from '@/components/registers/product/disableBulkProduct';
-import ProductForm from '@/components/registers/product/productform';
+import { productTableColumns } from '@/app/client/products/registerFields';
+import disableBulkProduct from '@/app/client/products/disableBulkProduct';
+import ProductForm from '@/app/client/products/components/productform';
 
 const getProducts = async (): Promise<tProduct[]> => {
   try {

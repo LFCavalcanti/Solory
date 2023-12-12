@@ -18,6 +18,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Select,
   Switch,
   Tab,
   TabList,
@@ -39,35 +40,38 @@ import { useRouter } from 'next/navigation';
 import { tFechAppReturn } from '@/types/tFechAppReturn';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
 import {
+  companyTableRow,
+  companyValidate,
+  tCompany,
+} from '@/types/Company/tCompany';
+import { tCompanyAddress } from '@/types/Company/tCompanyAddress';
+import { tCompanyCnaeIss } from '@/types/Company/tCompanyCnaeIss';
+import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import {
+  companyAddressTableColumns,
+  companyCnaeIssTableColumns,
+} from '../../registerFields';
 import { AddIcon, EditIcon, ViewIcon } from '@chakra-ui/icons';
 import { tRegistryColumnDef } from '@/types/tRegistryColumnDef';
 import { FaEllipsisVertical } from 'react-icons/fa6';
 import { BiBlock } from 'react-icons/bi';
 import { tRegistryAction } from '@/types/tRegistryAction';
+import CompanyAddressForm from '../companyAddressForm';
+import CompanyCnaeIssForm from '../companyCnaeIssForm';
+import { useCompanyAddressesStore } from '@/lib/hooks/state/useCompanyAddressesStore';
+import { useCompanyCnaeIssStore } from '@/lib/hooks/state/useCompanyCnaeIssStore';
 import { MdOutlineWidgets } from 'react-icons/md';
 import { z } from 'zod';
-import {
-  supplierTableRow,
-  supplierValidate,
-  tSupplier,
-} from '@/types/Supplier/tSupplier';
-import { tSupplierAddress } from '@/types/Supplier/tSupplierAddress';
-import { useSupplierAddressesStore } from '@/lib/hooks/state/useSupplierAddressesStore';
-import {
-  supplierAddressTableColumns,
-  supplierContactTableColumns,
-} from '../registerFields';
-import SupplierAddressForm from '../supplierAddressForm';
-import { useSupplierContactStore } from '@/lib/hooks/state/useSupplierContactStore';
-import SupplierContactForm from '../suppliercontactform';
+import { tCompanyGroup } from '@/types/CompanyGroup/tCompanyGroup';
+import { tFormSelectOptionList } from '@/types/tFormSelectOptions';
 
-export default function SupplierForm() {
+export default function CompanyForm() {
   const router = useRouter();
 
   const [startProcessingSpinner, stopProcessingSpinner] =
@@ -87,25 +91,24 @@ export default function SupplierForm() {
   const [adressFormAction, setAdressFormAction] =
     useState<tRegistryAction>(null);
   const [selectedAddress, setSelectedAddress] =
-    useState<tSupplierAddress | null>(null);
+    useState<tCompanyAddress | null>(null);
 
-  const [isContactFormOpen, setContactFormOpen] = useState(false);
-  const [contactFormAction, setContactFormAction] =
+  const [isCnaeIssFormOpen, setCnaeIssFormOpen] = useState(false);
+  const [cnaeIssFormAction, setCnaeIssFormAction] =
     useState<tRegistryAction>(null);
-  const [selectedContact, setSelectedContact] =
-    useState<tSupplierAddress | null>(null);
+  const [selectedCnaeIss, setSelectedCnaeIss] =
+    useState<tCompanyCnaeIss | null>(null);
 
-  const [supplierData, setSupplierData] = useState<tSupplier>();
+  const [companyData, setCompanyData] = useState<tCompany>();
+  const [companyGroupsList, setCompanyGroupsList] =
+    useState<tFormSelectOptionList>([]);
 
-  const [addressList, setAddressList, insertAddress] =
-    useSupplierAddressesStore((state) => [
-      state.addressList,
-      state.setList,
-      state.insertAddress,
-    ]);
+  const [addressList, setAddressList, insertAddress] = useCompanyAddressesStore(
+    (state) => [state.addressList, state.setList, state.insertAddress],
+  );
 
-  const [contactList, setContactList] = useSupplierContactStore((state) => [
-    state.contactList,
+  const [cnaeIssList, setCnaeIssList] = useCompanyCnaeIssStore((state) => [
+    state.cnaeIssList,
     state.setList,
   ]);
 
@@ -122,8 +125,8 @@ export default function SupplierForm() {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<tSupplier>({
-    resolver: zodResolver(supplierValidate),
+  } = useForm<tCompany>({
+    resolver: zodResolver(companyValidate),
   });
 
   const openAddressForm = (
@@ -135,18 +138,18 @@ export default function SupplierForm() {
     setAdressFormOpen(true);
   };
 
-  const openContactForm = (
+  const openCnaeIssForm = (
     cellData: tRegistryColumnDef | null,
     action: tRegistryAction,
   ) => {
-    setContactFormAction(action);
-    setSelectedContact(cellData);
-    setContactFormOpen(true);
+    setCnaeIssFormAction(action);
+    setSelectedCnaeIss(cellData);
+    setCnaeIssFormOpen(true);
   };
 
   const addressColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
     () => [
-      ...supplierAddressTableColumns,
+      ...companyAddressTableColumns,
       {
         id: 'actionButtons',
         header: 'Ações',
@@ -206,9 +209,9 @@ export default function SupplierForm() {
     [],
   );
 
-  const contactColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
+  const cnaeIssColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
     () => [
-      ...supplierContactTableColumns,
+      ...companyCnaeIssTableColumns,
       {
         id: 'actionButtons',
         header: 'Ações',
@@ -227,9 +230,9 @@ export default function SupplierForm() {
                   fontWeight="500"
                   fontSize="12px"
                   color="text.standard"
-                  icon={<ViewIcon />}
                   type="button"
-                  onClick={() => openContactForm(cellData, 'view')}
+                  icon={<ViewIcon />}
+                  onClick={() => openCnaeIssForm(cellData, 'view')}
                 >
                   Visualizar
                 </MenuItem>
@@ -242,7 +245,7 @@ export default function SupplierForm() {
                       color="text.standard"
                       type="button"
                       icon={<EditIcon />}
-                      onClick={() => openContactForm(cellData, 'edit')}
+                      onClick={() => openCnaeIssForm(cellData, 'edit')}
                     >
                       Editar
                     </MenuItem>
@@ -253,7 +256,7 @@ export default function SupplierForm() {
                       color="text.standard"
                       type="button"
                       icon={<BiBlock />}
-                      onClick={() => openContactForm(cellData, 'delete')}
+                      onClick={() => openCnaeIssForm(cellData, 'delete')}
                     >
                       Desativar
                     </MenuItem>
@@ -268,7 +271,7 @@ export default function SupplierForm() {
     [],
   );
 
-  const submitSupplier: SubmitHandler<tSupplier> = async (data) => {
+  const submitCompany: SubmitHandler<tCompany> = async (data) => {
     if (action === 'view') {
       closeForm();
       return;
@@ -304,12 +307,20 @@ export default function SupplierForm() {
       return;
     }
 
+    if (!cnaeIssList || cnaeIssList.length < 1) {
+      toast({
+        title: `Deve manter pelo menos um CNAE vs ISS`,
+        status: 'error',
+      });
+      return;
+    }
+
     if (action === 'delete') {
       try {
         updatedData = await fetchApp({
           method: 'PUT',
           baseUrl: window.location.origin,
-          endpoint: `/api/internal/suppliers/${registryId}`,
+          endpoint: `/api/internal/companies/${registryId}`,
           body: JSON.stringify({ isActive: false }),
           cache: 'no-store',
         });
@@ -318,7 +329,7 @@ export default function SupplierForm() {
       } catch (error) {
         console.error(error);
         toast({
-          title: `Erro ao desativar o fornecedor "${data.aliasName}"`,
+          title: `Erro ao desativar a empresa "${data.aliasName}"`,
           status: 'error',
         });
         return;
@@ -338,13 +349,13 @@ export default function SupplierForm() {
         baseUrl: window.location.origin,
         endpoint:
           action === 'insert'
-            ? '/api/internal/suppliers'
-            : `/api/internal/suppliers/${registryId}`,
+            ? '/api/internal/companies'
+            : `/api/internal/companies/${registryId}`,
         body: JSON.stringify({
           ...data,
           ...(action === 'insert' && {
             addresses: addressList,
-            contacts: contactList,
+            cnaeIss: cnaeIssList,
           }),
         }),
         cache: 'no-store',
@@ -355,8 +366,8 @@ export default function SupplierForm() {
       console.error(error);
       const message =
         action === 'insert'
-          ? `Erro ao incluir fornecedor "${data.aliasName}"`
-          : `Erro ao editar fornecedor "${data.aliasName}"`;
+          ? `Erro ao incluir empresa "${data.aliasName}"`
+          : `Erro ao editar empresa "${data.aliasName}"`;
       toast({
         title: message,
         status: 'error',
@@ -366,8 +377,8 @@ export default function SupplierForm() {
     toast({
       title:
         action === 'insert'
-          ? `Fornecedor "${data.aliasName}" incluida com sucesso`
-          : `Fornecedor "${data.aliasName}" editada com sucesso`,
+          ? `Empresa "${data.aliasName}" incluida com sucesso`
+          : `Empresa "${data.aliasName}" editada com sucesso`,
       status: 'success',
     });
     closeForm();
@@ -381,7 +392,7 @@ export default function SupplierForm() {
     const cnpjValidator = z
       .string()
       .trim()
-      .min(1)
+      .nonempty()
       .regex(/\d{14}/)
       .max(14);
 
@@ -413,11 +424,12 @@ export default function SupplierForm() {
 
     const companyApiData = await apiDataReturn.json();
 
-    const companyMainData: tSupplier = {
+    const companyMainData: tCompany = {
       isActive: true,
       aliasName: String(companyApiData.razao_social).slice(0, 60),
       fullName: companyApiData.razao_social,
       cnpj: companyApiData.cnpj,
+      mainCnae: String(companyApiData.cnae_fiscal),
       isMei:
         companyApiData.opcao_pelo_mei == null
           ? false
@@ -429,7 +441,7 @@ export default function SupplierForm() {
       phone: companyApiData.ddd_telefone_1,
     };
 
-    const companyMainAddress: tSupplierAddress = {
+    const companyMainAddress: tCompanyAddress = {
       isActive: true,
       isMainAddress: true,
       street: `${companyApiData.descricao_tipo_de_logradouro} ${companyApiData.logradouro}`,
@@ -441,11 +453,31 @@ export default function SupplierForm() {
       cityCode: String(companyApiData.codigo_municipio_ibge),
     };
 
-    setSupplierData(companyMainData);
+    const companyMainCnaeIss: tCompanyCnaeIss = {
+      isActive: true,
+      cnaeCode: String(companyApiData.cnae_fiscal),
+      description: companyApiData.cnae_fiscal_descricao,
+    };
+
+    const secondaryCnaeIssList: tCompanyCnaeIss[] =
+      companyApiData.cnaes_secundarios.map(
+        (item: { codigo: string; descricao: string }) => {
+          return {
+            isActive: true,
+            cnaeCode: String(item.codigo),
+            description: item.descricao,
+          };
+        },
+      );
+
+    setCompanyData(companyMainData);
     reset(companyMainData);
 
     setAddressList([]);
     insertAddress(companyMainAddress);
+    setCnaeIssList([companyMainCnaeIss, ...secondaryCnaeIssList]);
+    //insertCnaeIss(companyCnaeIss);
+
     stopProcessingSpinner();
   };
 
@@ -456,9 +488,9 @@ export default function SupplierForm() {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  const contactTable = useReactTable({
-    columns: contactColumns,
-    data: contactList,
+  const cnaeIssTable = useReactTable({
+    columns: cnaeIssColumns,
+    data: cnaeIssList,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
@@ -466,21 +498,41 @@ export default function SupplierForm() {
   useEffect(() => {
     startProcessingSpinner();
     if (!registryData && action === 'insert') {
+      fetchApp({
+        endpoint: `/api/internal/companygroups?onlyActive=true&orderBy=name`,
+        baseUrl: window.location.origin,
+        cache: 'no-store',
+      })
+        .then((result) => {
+          const companyGroups: tCompanyGroup[] = result.body;
+          const optionList = companyGroups.map((item) => {
+            return {
+              label: item.name || '',
+              value: item.id || '',
+            };
+          });
+          setCompanyGroupsList(optionList);
+          stopProcessingSpinner();
+        })
+        .catch((error) => {
+          console.error(`FETCH ERROR: ${error}`);
+          stopProcessingSpinner();
+          throw error;
+        });
       reset({
         isActive: true,
       });
-      stopProcessingSpinner();
       return;
     }
     if (!registryData && action !== 'insert') {
       stopProcessingSpinner();
-      throw new Error('Must provide Supplier data');
+      throw new Error('Must provide Company data');
     }
 
-    const rowData = supplierTableRow.safeParse(registryData);
+    const rowData = companyTableRow.safeParse(registryData);
 
     if (!rowData.success)
-      throw new Error('Supplier data type validation failed');
+      throw new Error('Company data type validation failed');
 
     setRegistryId(rowData.data.id);
     setRegistryCreatedAt(rowData.data.createdAt);
@@ -488,14 +540,14 @@ export default function SupplierForm() {
     Promise.all([
       // PRINCIPAL
       fetchApp({
-        endpoint: `/api/internal/suppliers/${rowData.data.id}`,
+        endpoint: `/api/internal/companies/${rowData.data.id}`,
         baseUrl: window.location.origin,
       })
         .then((result) => {
           reset({
             ...result.body,
           });
-          setSupplierData(result.body);
+          setCompanyData(result.body);
         })
         .catch((error) => {
           console.error(`FETCH ERROR: ${error}`);
@@ -503,7 +555,7 @@ export default function SupplierForm() {
         }),
       // ENDEREÇOS
       fetchApp({
-        endpoint: `/api/internal/suppliers/${rowData.data.id}/addresses`,
+        endpoint: `/api/internal/companies/${rowData.data.id}/addresses`,
         baseUrl: window.location.origin,
       })
         .then((result) => {
@@ -513,13 +565,33 @@ export default function SupplierForm() {
           console.error(`FETCH ERROR: ${error}`);
           throw error;
         }),
-      // CONTATOS
+      // CNAE ISS
       fetchApp({
-        endpoint: `/api/internal/suppliers/${rowData.data.id}/contacts`,
+        endpoint: `/api/internal/companies/${rowData.data.id}/cnaeiss`,
         baseUrl: window.location.origin,
       })
         .then((result) => {
-          setContactList(result.body);
+          setCnaeIssList(result.body);
+        })
+        .catch((error) => {
+          console.error(`FETCH ERROR: ${error}`);
+          throw error;
+        }),
+      // COMPANY GROUP LIST
+      fetchApp({
+        endpoint: `/api/internal/companygroups?onlyActive=true&orderBy=name`,
+        baseUrl: window.location.origin,
+        cache: 'no-store',
+      })
+        .then((result) => {
+          const companyGroups: tCompanyGroup[] = result.body;
+          const optionList = companyGroups.map((item) => {
+            return {
+              label: item.name || '',
+              value: item.id || '',
+            };
+          });
+          setCompanyGroupsList(optionList);
         })
         .catch((error) => {
           console.error(`FETCH ERROR: ${error}`);
@@ -528,25 +600,25 @@ export default function SupplierForm() {
     ]).then(() => stopProcessingSpinner());
   }, []);
 
-  const title = getTitleByAction('FORNECEDOR', action);
+  const title = getTitleByAction('EMPRESA', action);
   return (
     <Flex direction="column" padding={4} gap={3} height="100%" width="100%">
       {isAdressFormOpen && (
-        <SupplierAddressForm
+        <CompanyAddressForm
           formAction={adressFormAction}
           isFormOpen={isAdressFormOpen}
           setIsFormOpen={setAdressFormOpen}
           addressData={selectedAddress}
-          supplierData={supplierData}
+          companyData={companyData}
         />
       )}
-      {isContactFormOpen && (
-        <SupplierContactForm
-          formAction={contactFormAction}
-          isFormOpen={isContactFormOpen}
-          setIsFormOpen={setContactFormOpen}
-          contactData={selectedContact}
-          supplierData={supplierData}
+      {isCnaeIssFormOpen && (
+        <CompanyCnaeIssForm
+          formAction={cnaeIssFormAction}
+          isFormOpen={isCnaeIssFormOpen}
+          setIsFormOpen={setCnaeIssFormOpen}
+          cnaeIssData={selectedCnaeIss}
+          companyData={companyData}
         />
       )}
       <Heading
@@ -612,35 +684,54 @@ export default function SupplierForm() {
           </Button>
         </Flex>
       )}
-      <form onSubmit={handleSubmit(submitSupplier)}>
+      <form onSubmit={handleSubmit(submitCompany)}>
         <Tabs variant="registryTabs">
           <TabList>
             <Tab>Principal</Tab>
+            <Tab>CNAE e ISS</Tab>
             <Tab>Endereços</Tab>
-            <Tab>Contatos</Tab>
           </TabList>
           <TabPanels>
             {/* PRINCIPAL */}
             <TabPanel>
               <Flex direction="column" gap={3}>
-                <FormControl isInvalid={errors.code !== undefined}>
+                <FormControl isInvalid={errors.companyGroupId !== undefined}>
                   <FormLabel fontSize="11px" color="text.standard">
-                    Código:
+                    Grupo de Empresas:
                   </FormLabel>
-                  <Input
-                    type="text"
-                    variant="outline"
-                    fontSize="12px"
-                    placeholder="Código"
-                    bg="backgroundLight"
-                    focusBorderColor="contrast.500"
-                    errorBorderColor="error"
-                    color="text.standard"
-                    rounded={0}
-                    isReadOnly={action === 'view' || action === 'delete'}
-                    {...register('code')}
+                  <Controller
+                    control={control}
+                    name={'companyGroupId'}
+                    key={'companyGroupId'}
+                    defaultValue={''}
+                    rules={{ required: 'Selecione um grupo de empresas' }}
+                    render={({ field: { onChange, value, name, ref } }) => (
+                      <Select
+                        variant="outline"
+                        fontSize="12px"
+                        bg="backgroundLight"
+                        focusBorderColor="contrast.500"
+                        errorBorderColor="error"
+                        color="text.standard"
+                        placeholder="Selecione um grupo..."
+                        rounded={0}
+                        name={name}
+                        ref={ref}
+                        onChange={onChange}
+                        value={value}
+                        pointerEvents={action !== 'insert' ? 'none' : 'auto'}
+                      >
+                        {companyGroupsList.map((item) => (
+                          <option key={item.value} value={item.value}>
+                            {item.label}
+                          </option>
+                        ))}
+                      </Select>
+                    )}
                   />
-                  <FormErrorMessage>{errors.code?.message}</FormErrorMessage>
+                  <FormErrorMessage>
+                    {errors.companyGroupId?.message}
+                  </FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={errors.aliasName !== undefined}>
@@ -727,6 +818,50 @@ export default function SupplierForm() {
                   <FormErrorMessage>{errors.phone?.message}</FormErrorMessage>
                 </FormControl>
 
+                <FormControl isInvalid={errors.mainCnae !== undefined}>
+                  <FormLabel fontSize="11px" color="text.standard">
+                    CNAE Principal:
+                  </FormLabel>
+                  <Input
+                    type="text"
+                    variant="outline"
+                    fontSize="12px"
+                    placeholder="Código CNAE"
+                    bg="backgroundLight"
+                    focusBorderColor="contrast.500"
+                    errorBorderColor="error"
+                    color="text.standard"
+                    rounded={0}
+                    isReadOnly={action === 'view' || action === 'delete'}
+                    {...register('mainCnae')}
+                  />
+                  <FormErrorMessage>
+                    {errors.mainCnae?.message}
+                  </FormErrorMessage>
+                </FormControl>
+
+                <FormControl isInvalid={errors.mainIssCode !== undefined}>
+                  <FormLabel fontSize="11px" color="text.standard">
+                    Código ISS Principal:
+                  </FormLabel>
+                  <Input
+                    type="text"
+                    variant="outline"
+                    fontSize="12px"
+                    placeholder="Código ISS"
+                    bg="backgroundLight"
+                    focusBorderColor="contrast.500"
+                    errorBorderColor="error"
+                    color="text.standard"
+                    rounded={0}
+                    isReadOnly={action === 'view' || action === 'delete'}
+                    {...register('mainIssCode')}
+                  />
+                  <FormErrorMessage>
+                    {errors.mainIssCode?.message}
+                  </FormErrorMessage>
+                </FormControl>
+
                 <FormControl isInvalid={errors.isActive !== undefined}>
                   <FormLabel fontSize="11px" color="text.standard">
                     Ativo?
@@ -805,6 +940,76 @@ export default function SupplierForm() {
                 </Flex>
               </Flex>
             </TabPanel>
+            {/* CNAE ISS */}
+            <TabPanel>
+              <Flex
+                alignItems="left"
+                justifyContent="flexStart"
+                flexDirection="column"
+                padding={4}
+                gap={2}
+              >
+                {(action === 'insert' || action === 'edit') && (
+                  <Button
+                    // eslint-disable-next-line react/jsx-no-undef
+                    leftIcon={<AddIcon />}
+                    variant="primaryOutline"
+                    type="button"
+                    onClick={() => openCnaeIssForm(null, 'insert')}
+                    maxW={24}
+                  >
+                    Incluir
+                  </Button>
+                )}
+                <Table
+                  size="sm"
+                  variant="registryExport"
+                  maxWidth="100%"
+                  mt={4}
+                >
+                  <Thead>
+                    {cnaeIssTable.getHeaderGroups().map((headerGroup) => (
+                      <Tr key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => {
+                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                          const meta: any = header.column.columnDef.meta;
+                          return (
+                            <Th
+                              key={header.id}
+                              onClick={header.column.getToggleSortingHandler()}
+                              isNumeric={meta?.isNumeric}
+                            >
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                            </Th>
+                          );
+                        })}
+                      </Tr>
+                    ))}
+                  </Thead>
+                  <Tbody>
+                    {cnaeIssTable.getRowModel().rows.map((row) => (
+                      <Tr key={row.id}>
+                        {row.getVisibleCells().map((cell) => {
+                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                          const meta: any = cell.column.columnDef.meta;
+                          return (
+                            <Td key={cell.id} isNumeric={meta?.isNumeric}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </Td>
+                          );
+                        })}
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Flex>
+            </TabPanel>
             {/* ENDEREÇOS */}
             <TabPanel>
               <Flex
@@ -857,84 +1062,6 @@ export default function SupplierForm() {
                   </Thead>
                   <Tbody>
                     {addressTable.getRowModel().rows.map((row) => (
-                      <Tr key={row.id}>
-                        {row.getVisibleCells().map((cell) => {
-                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-                          const meta: any = cell.column.columnDef.meta;
-                          const rowData: any = row.original;
-                          return (
-                            <Td
-                              key={cell.id}
-                              isNumeric={meta?.isNumeric}
-                              color={
-                                rowData.isActive ? 'text.standard' : 'gray.400'
-                              }
-                            >
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )}
-                            </Td>
-                          );
-                        })}
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </Flex>
-            </TabPanel>
-            {/* CONTATOS */}
-            <TabPanel>
-              <Flex
-                alignItems="left"
-                justifyContent="flexStart"
-                flexDirection="column"
-                padding={4}
-                gap={2}
-              >
-                {(action === 'insert' || action === 'edit') && (
-                  <Button
-                    // eslint-disable-next-line react/jsx-no-undef
-                    leftIcon={<AddIcon />}
-                    variant="primaryOutline"
-                    onClick={() => openContactForm(null, 'insert')}
-                    maxW={24}
-                    type="button"
-                  >
-                    Incluir
-                  </Button>
-                )}
-
-                <Table
-                  size="sm"
-                  variant="registryExport"
-                  maxWidth="100%"
-                  mt={4}
-                >
-                  <Thead>
-                    {contactTable.getHeaderGroups().map((headerGroup) => (
-                      <Tr key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => {
-                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
-                          const meta: any = header.column.columnDef.meta;
-                          return (
-                            <Th
-                              key={header.id}
-                              onClick={header.column.getToggleSortingHandler()}
-                              isNumeric={meta?.isNumeric}
-                            >
-                              {flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                            </Th>
-                          );
-                        })}
-                      </Tr>
-                    ))}
-                  </Thead>
-                  <Tbody>
-                    {contactTable.getRowModel().rows.map((row) => (
                       <Tr key={row.id}>
                         {row.getVisibleCells().map((cell) => {
                           // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
