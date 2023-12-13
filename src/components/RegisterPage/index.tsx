@@ -49,10 +49,10 @@ import { useRegistryFormStore } from '@/lib/hooks/state/useRegistryFormStore';
 import { useRegistryExportStore } from '@/lib/hooks/state/useRegistryExportStore';
 import RegistryModal from './RegistryModal';
 import RegistryExport from './RegistryExport';
-import { tBulkActionReturn } from '@/types/tBulkActionReturn';
 import { useRouter } from 'next/navigation';
 import { tRegistryColumnDef } from '@/types/tRegistryColumnDef';
 import { useLoadingSpinnerStore } from '@/lib/hooks/state/useLoadingSpinnerStore';
+import deleteBulkContract from '@/lib/deleteBulkRegisters';
 
 interface Props {
   registerData: object[];
@@ -60,7 +60,7 @@ interface Props {
   title: string;
   delAction?: 'disable' | 'delete';
   FormComponent: React.FC;
-  deleteBulkFunction: (args: any) => tBulkActionReturn;
+  registryApiEndpoint: string;
 }
 
 export default function RegisterPage({
@@ -69,7 +69,7 @@ export default function RegisterPage({
   registerColumns,
   title,
   delAction = 'delete',
-  deleteBulkFunction,
+  registryApiEndpoint,
 }: Props) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [searchInput, setSearchInput] = useState('');
@@ -197,10 +197,15 @@ export default function RegisterPage({
 
   const handleBulkDelete = async () => {
     startProcessingSpinner();
-    const selectedRows = table.getSelectedRowModel().flatRows.map((row) => {
-      return row.original;
-    });
-    const deleteResult = await deleteBulkFunction(selectedRows);
+    const selectedRows = table
+      .getSelectedRowModel()
+      .flatRows.map((row: any) => {
+        return { id: row.original.id, isActive: row.original.isActive };
+      });
+    const deleteResult = await deleteBulkContract(
+      selectedRows,
+      registryApiEndpoint,
+    );
 
     if (!deleteResult || (deleteResult && !deleteResult.result)) {
       console.error(deleteResult);
