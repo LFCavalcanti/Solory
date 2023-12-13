@@ -255,3 +255,8 @@ ALTER TABLE "CompanyCnaeIss" ADD CONSTRAINT "CompanyCnaeIss_companyId_fkey" FORE
 
 -- AddForeignKey
 ALTER TABLE "simplesNacConfig" ADD CONSTRAINT "simplesNacConfig_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Add default Product Types
+INSERT INTO public."productType"(
+	id, description)
+	VALUES ('MC', 'Mercadoria'), ('PR', 'Item Projeto'), ('SV', 'Serviço');
