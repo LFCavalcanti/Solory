@@ -3,7 +3,6 @@ import fetchApp from '@/lib/fetchApp';
 import { tCompanyGroup } from '@/types/CompanyGroup/tCompanyGroup';
 import { companyGroupTableColumns } from '@/app/client/companygroups/registerFields';
 import CompanyGroupForm from '@/app/client/companygroups/components/companygroupform';
-import disableBulkCompanyGroup from '@/app/client/companygroups/disableBulkCompanyGroup';
 import { headers } from 'next/headers';
 
 const getCompanyGroups = async (): Promise<tCompanyGroup[]> => {
@@ -31,7 +30,7 @@ export default async function companygroup() {
         registerColumns={companyGroupTableColumns}
         delAction="disable"
         FormComponent={CompanyGroupForm}
-        deleteBulkFunction={disableBulkCompanyGroup}
+        registryApiEndpoint="/api/internal/companygroups"
       />
     </>
   );

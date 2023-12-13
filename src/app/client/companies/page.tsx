@@ -2,7 +2,6 @@ import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
 import { companyTableColumns } from '@/app/client/companies/registerFields';
 import CompanyForm from '@/app/client/companies/components/companyform';
-import disableBulkCompany from '@/app/client/companies/disableBulkCompany';
 import { headers } from 'next/headers';
 import { tCompany } from '@/types/Company/tCompany';
 
@@ -31,7 +30,7 @@ export default async function companygroup() {
         registerColumns={companyTableColumns}
         delAction="disable"
         FormComponent={CompanyForm}
-        deleteBulkFunction={disableBulkCompany}
+        registryApiEndpoint="/api/internal/companies"
       />
     </>
   );

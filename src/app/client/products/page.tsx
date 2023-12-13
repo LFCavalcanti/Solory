@@ -3,7 +3,6 @@ import fetchApp from '@/lib/fetchApp';
 import { headers } from 'next/headers';
 import { tProduct } from '@/types/Product/tProduct';
 import { productTableColumns } from '@/app/client/products/registerFields';
-import disableBulkProduct from '@/app/client/products/disableBulkProduct';
 import ProductForm from '@/app/client/products/components/productform';
 
 const getProducts = async (): Promise<tProduct[]> => {
@@ -31,7 +30,7 @@ export default async function companygroup() {
         registerColumns={productTableColumns}
         delAction="disable"
         FormComponent={ProductForm}
-        deleteBulkFunction={disableBulkProduct}
+        registryApiEndpoint="/api/internal/products"
       />
     </>
   );

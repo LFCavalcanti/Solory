@@ -2,7 +2,6 @@ import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
 import { headers } from 'next/headers';
 import { tCustomer } from '@/types/Customer/tCustomer';
-import disableBulkCustomer from '@/app/client/customers/disableBulkCustomer';
 import { customerTableColumns } from '@/app/client/customers/registerFields';
 import CustomerForm from '@/app/client/customers/components/customerform';
 
@@ -31,7 +30,7 @@ export default async function customers() {
         registerColumns={customerTableColumns}
         delAction="disable"
         FormComponent={CustomerForm}
-        deleteBulkFunction={disableBulkCustomer}
+        registryApiEndpoint="/api/internal/customers"
       />
     </>
   );

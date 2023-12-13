@@ -3,7 +3,6 @@ import fetchApp from '@/lib/fetchApp';
 import { headers } from 'next/headers';
 import { contractTableColumns } from '@/app/client/contracts/registerFields';
 import ContractForm from '@/app/client/contracts/components/contractform';
-import disableBulkContract from '@/app/client/contracts/disableBulkContract';
 import { tContract } from '@/types/Contract/tContract';
 
 const getContracts = async (): Promise<tContract[]> => {
@@ -31,7 +30,7 @@ export default async function Contracts() {
         registerColumns={contractTableColumns}
         delAction="disable"
         FormComponent={ContractForm}
-        deleteBulkFunction={disableBulkContract}
+        registryApiEndpoint="/api/internal/contracts"
       />
     </>
   );

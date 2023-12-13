@@ -2,7 +2,6 @@ import RegisterPage from '@/components/RegisterPage';
 import fetchApp from '@/lib/fetchApp';
 import { headers } from 'next/headers';
 import { tSupplier } from '@/types/Supplier/tSupplier';
-import disableBulkSupplier from '@/app/client/suppliers/disableBulkSupplier';
 import { supplierTableColumns } from '@/app/client/suppliers/registerFields';
 import SupplierForm from '@/app/client/suppliers/components/supplierform';
 
@@ -31,7 +30,7 @@ export default async function suppliers() {
         registerColumns={supplierTableColumns}
         delAction="disable"
         FormComponent={SupplierForm}
-        deleteBulkFunction={disableBulkSupplier}
+        registryApiEndpoint="/api/internal/suppliers"
       />
     </>
   );

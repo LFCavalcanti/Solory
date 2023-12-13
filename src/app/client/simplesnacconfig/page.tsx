@@ -1,5 +1,4 @@
 import RegisterPage from '@/components/RegisterPage';
-import disableBulkSimplesNacConfig from '@/app/client/simplesnacconfig/disableBulkSimplesNacConfig';
 import { simplesNacConfigTableColumns } from '@/app/client/simplesnacconfig/registerFields';
 import SimplesNacConfigForm from '@/app/client/simplesnacconfig/components/simplesNacConfigForm';
 import fetchApp from '@/lib/fetchApp';
@@ -30,7 +29,7 @@ export default async function simplesnacconfig() {
         registerColumns={simplesNacConfigTableColumns}
         delAction="disable"
         FormComponent={SimplesNacConfigForm}
-        deleteBulkFunction={disableBulkSimplesNacConfig}
+        registryApiEndpoint="/api/internal/simplesnacconfig"
       />
     </>
   );
