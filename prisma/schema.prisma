@@ -133,6 +133,7 @@ model Company {
   products Product[]
   customers       Customer[]
   contracts Contract[]
+  projects Project[]
 
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
@@ -327,6 +328,7 @@ model Contract {
   customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId String
   items    ContractItem[]
+  projects    Project[]
 }
 
 model ContractItem {
@@ -340,6 +342,7 @@ model ContractItem {
   productId String
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
   contractId String
+  projectMilestones ProjectMilestone[]
 }
 
 model Customer {
@@ -362,6 +365,7 @@ model Customer {
   adresses     CustomerAddress[]
   contacts    CustomerContact[]
   contracts Contract[]
+  projects Project[]
 
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
@@ -373,7 +377,7 @@ model Customer {
 model CustomerAddress {
   id  String @id @default(cuid())
   isActive     Boolean @default(true)
-  supplier   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId String
   isMainAddress Boolean
   street String
@@ -399,4 +403,83 @@ model CustomerContact {
   phone String
   customerId String
   supplier   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id  String @default(cuid())
+  version Int @default(1)
+  isActive     Boolean @default(true)
+  createdAt       DateTime
+  disabledAt      DateTime?
+  name String
+  description String
+  type String
+  status String
+  progress Int
+  startDate DateTime
+  endDate DateTime?
+  totalCost Float
+  measureType String
+  customer Customer @relation(fields: [customerId], references:[id], onDelete: Cascade)
+  customerId String
+  contract Contract? @relation(fields: [contractId], references:[id], onDelete: Cascade)
+  contractId String?
+  company Company @relation(fields: [companyId], references:[id], onDelete: Cascade)
+  companyId String
+  milestones ProjectMilestone[]
+  @@id(name: "projectId", [id, version])
+}
+
+model ProjectMilestone {
+  id  String @id @default(cuid())
+  isActive     Boolean @default(true)
+  createdAt       DateTime
+  disabledAt      DateTime?
+  order Int
+  description String
+  status String
+  progress Int
+  isPaymentReq Boolean @default(false)
+  paymentValue Float
+  contractItem ContractItem? @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
+  contractItemId String?
+  project   Project @relation(fields: [projectId, ProjectVersion], references: [id, version], onDelete: Cascade)
+  projectId String
+  ProjectVersion Int
+  tasks ProjectTask[]
+}
+
+model ProjectTask {
+  id  String @id @default(cuid())
+  isActive     Boolean @default(true)
+  createdAt       DateTime
+  disabledAt      DateTime?
+  order Int
+  description String
+  status String
+  progress Int
+  effortUnit String
+  effortQuantity Float
+  effortExecuted Float @default(0)
+  effortBalance Float
+  milestone ProjectMilestone? @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  milestoneId String?
+  activities ProjectActivity[]
+}
+
+model ProjectActivity {
+  id  String @id @default(cuid())
+  isActive     Boolean @default(true)
+  createdAt       DateTime
+  disabledAt      DateTime?
+  order Int
+  description String
+  status String
+  progress Int
+  effortUnit String
+  effortQuantity Float
+  effortExecuted Float @default(0)
+  effortBalance Float
+  task   ProjectTask @relation(fields: [taskId], references: [id])
+  taskId String
 }
