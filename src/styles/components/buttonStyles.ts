@@ -116,6 +116,22 @@ export const ButtonStyles = {
         borderColor: 'red.200',
       },
     },
+    enable: {
+      bg: 'transparent',
+      border: '2px solid',
+      borderColor: 'green.400',
+      color: 'green.400',
+      boxShadow: 'inner',
+      _hover: {
+        bg: 'green.400',
+        color: 'text.darkMode',
+      },
+      _active: {
+        bg: 'green.200',
+        color: 'text.darkMode',
+        borderColor: 'green.200',
+      },
+    },
     tableMenu: {
       bg: 'transparent',
       color: 'text.standard',
