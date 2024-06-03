@@ -416,8 +416,8 @@ model Project {
   type String
   status String
   progress Int
-  startDate DateTime
-  endDate DateTime?
+  startDate DateTime @db.Date
+  endDate DateTime? @db.Date
   totalCost Float
   measureType String
   customer Customer @relation(fields: [customerId], references:[id], onDelete: Cascade)
