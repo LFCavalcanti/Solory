@@ -160,6 +160,20 @@ export const ButtonStyles = {
         boxShadow: 'sm',
       },
     },
+    expandRetractLine: {
+      bg: 'transparent',
+      border: 'none',
+      padding: 0,
+      color: 'dark.400',
+      _hover: {
+        color: 'contrast.500',
+        bg: 'transparent',
+      },
+      _active: {
+        color: 'contrast.300',
+        bg: 'transparent',
+      },
+    },
   },
   defaultProps: {},
 };
