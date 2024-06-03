@@ -40,11 +40,15 @@ export async function GET(request: NextRequest) {
   const registryList = await prisma.project.findMany({
     where: {
       companyId: activeCompany?.id,
+      NOT: {
+        status: 'REVIEWED',
+      },
       ...(onlyActive === 'true' && { isActive: true }),
     },
     ...(tableList === 'true' && {
       select: {
         id: true,
+        version: true,
         name: true,
         type: true,
         status: true,
