@@ -83,6 +83,7 @@ export async function POST(
   });
 
   if (!updatedProject) {
+    console.error('ERROR UPDATING PROJECT TO BLOCKED');
     return new NextResponse(
       JSON.stringify({
         message: 'Error updating project progress',
@@ -93,5 +94,12 @@ export async function POST(
     );
   }
 
-  return new NextResponse();
+  return new NextResponse(
+    JSON.stringify({
+      message: 'Project blocked',
+    }),
+    {
+      status: 200,
+    },
+  );
 }

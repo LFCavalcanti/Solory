@@ -7,7 +7,6 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
-  const body = await request.json();
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user.id) {
@@ -26,20 +25,6 @@ export async function POST(
       userId: session.user.id,
     },
   });
-
-  if (
-    !body.action ||
-    (body.action && !(body.action === 'APPROVE' || body.action === 'REFUSE'))
-  ) {
-    return new NextResponse(
-      JSON.stringify({
-        message: 'Invalid action in body.',
-      }),
-      {
-        status: 400,
-      },
-    );
-  }
 
   const activeCompany = await prisma.company.findFirst({
     where: {
@@ -88,7 +73,7 @@ export async function POST(
     );
   }
 
-  if (body.action === 'APPROVE' && projectData.status !== 'PROPOSAL') {
+  if (!projectData.contractId || projectData.status !== 'PROPOSAL') {
     return new NextResponse(
       JSON.stringify({
         message: 'Incorrect payload',
@@ -99,64 +84,52 @@ export async function POST(
     );
   }
 
-  if (body.action === 'APPROVE' && !projectData.contractId) {
-    return new NextResponse(
-      JSON.stringify({
-        message: 'Incorrect payload',
-      }),
-      {
-        status: 400,
-      },
-    );
-  }
-
-  if (body.action === 'APPROVE') {
-    try {
-      const milestones = await prisma.projectMilestone.findMany({
-        where: {
-          projectId: projectData.id,
-        },
-      });
-
-      if (!milestones) {
-        throw new Error('Invalid project ID or no permission');
-      }
-
-      milestones.forEach((milestone) => {
-        if (!milestone.contractItemId)
-          throw new Error('Approved projects need a VALID contract item');
-      });
-    } catch (error) {
-      console.error(error);
-      return new NextResponse(
-        JSON.stringify({
-          message: `${error}`,
-        }),
-        {
-          status: 400,
-        },
-      );
-    }
-
-    const updatedProject = await prisma.project.update({
-      //where: { id: params.id, version: projectData.version },
-      where: { projectId: { id: params.id, version: projectData.version } },
-      data: {
-        status: body.action === 'APPROVE' ? 'APPROVED' : 'REFUSED',
+  try {
+    const milestones = await prisma.projectMilestone.findMany({
+      where: {
+        projectId: projectData.id,
+        isActive: true,
       },
     });
 
-    if (!updatedProject) {
-      return new Response(
-        JSON.stringify({
-          message: 'Error updating project',
-        }),
-        {
-          status: 409,
-        },
-      );
+    if (!milestones) {
+      throw new Error('Invalid project ID or no permission');
     }
 
-    return new Response(JSON.stringify(updatedProject));
+    milestones.forEach((milestone) => {
+      if (!milestone.contractItemId)
+        throw new Error('Approved projects need a VALID contract item');
+    });
+  } catch (error) {
+    console.error(error);
+    return new NextResponse(
+      JSON.stringify({
+        message: `${error}`,
+      }),
+      {
+        status: 400,
+      },
+    );
   }
+
+  const updatedProject = await prisma.project.update({
+    //where: { id: params.id, version: projectData.version },
+    where: { projectId: { id: params.id, version: projectData.version } },
+    data: {
+      status: 'APPROVED',
+    },
+  });
+
+  if (!updatedProject) {
+    return new Response(
+      JSON.stringify({
+        message: 'Error updating project',
+      }),
+      {
+        status: 409,
+      },
+    );
+  }
+
+  return new Response(JSON.stringify(updatedProject));
 }

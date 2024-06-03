@@ -73,19 +73,29 @@ export async function POST(
     );
   }
 
+  if (!projectData.contractId || projectData.status !== 'PROPOSAL') {
+    return new NextResponse(
+      JSON.stringify({
+        message: 'Incorrect payload',
+      }),
+      {
+        status: 400,
+      },
+    );
+  }
+
   const updatedProject = await prisma.project.update({
-    where: {
-      projectId: { id: projectData.id, version: projectData.version },
-    },
+    //where: { id: params.id, version: projectData.version },
+    where: { projectId: { id: params.id, version: projectData.version } },
     data: {
-      isActive: true,
+      status: 'REFUSED',
     },
   });
 
   if (!updatedProject) {
-    return new NextResponse(
+    return new Response(
       JSON.stringify({
-        message: 'Error updating project progress',
+        message: 'Error updating project',
       }),
       {
         status: 409,
@@ -93,12 +103,5 @@ export async function POST(
     );
   }
 
-  return new NextResponse(
-    JSON.stringify({
-      message: 'Project unblocked',
-    }),
-    {
-      status: 200,
-    },
-  );
+  return new Response(JSON.stringify(updatedProject));
 }
