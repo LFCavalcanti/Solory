@@ -43,7 +43,7 @@ export default async function fetchApp({
     });
     return { status: response.status, body: await response.json() };
   } catch (error) {
-    console.error(`${error}`);
+    console.error('ERRO FECHAPP:', `${error}`);
     throw new Error(`${error}`);
   }
 }
