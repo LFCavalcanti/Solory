@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { tSelectMenuOption } from '../tSelectMenuOption';
+import { tProjectTaskWithActivities } from './tProjectTask';
 
 const statusLiterals = z.union([
   z.literal('CREATED'),
@@ -29,7 +30,7 @@ export const newProjectMilestoneValidate = z.object({
   progress: z.coerce.number().nonnegative().max(100),
   isPaymentReq: z.boolean(),
   paymentValue: z.coerce.number().nonnegative(),
-  contractItemId: z.string().optional(),
+  contractItemId: z.string().trim().min(1).optional().nullable(),
 });
 
 export const projectMilestoneValidate = z.object({
@@ -45,7 +46,7 @@ export const projectMilestoneValidate = z.object({
   progress: z.coerce.number().nonnegative().max(100).optional(),
   isPaymentReq: z.boolean().optional(),
   paymentValue: z.coerce.number().nonnegative().optional(),
-  contractItemId: z.string().optional().optional(),
+  contractItemId: z.string().optional().nullable(),
 });
 
 export const projectMilestoneTableRowValidate = z.object({
@@ -66,3 +67,6 @@ export type tProjectMilestone = z.infer<typeof projectMilestoneValidate>;
 export type tProjectMilestoneTableRow = z.infer<
   typeof projectMilestoneTableRowValidate
 >;
+export type tProjectMilestoneWithTasks = tProjectMilestone & {
+  tasks: tProjectTaskWithActivities[];
+};

@@ -14,6 +14,7 @@ import { tContractItem } from '@/types/Contract/tContractItem';
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const session = await getServerSession(authOptions);
+  const creationDate = new Date().toISOString();
 
   if (!session || !session.user.id) {
     return new NextResponse(
@@ -89,7 +90,6 @@ export async function POST(request: NextRequest) {
         },
       });
     }
-
     milestones = body.milestones.map((milestone: any) => {
       const validatedMilestone =
         newProjectMilestoneValidate.safeParse(milestone);
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      let tasks = milestones.tasks.map((task: any) => {
+      let tasks = milestone.tasks.map((task: any) => {
         const validatedTask = newProjectTaskValidate.safeParse(task);
         if (!validatedTask.success) {
           console.error(validatedTask.error);
@@ -128,7 +128,10 @@ export async function POST(request: NextRequest) {
         }
 
         if (!task.activities || task.activities.length) {
-          return validatedTask.data;
+          return {
+            ...validatedTask.data,
+            createdAt: creationDate,
+          };
         }
 
         const activities = task.activities.map((activity: any) => {
@@ -142,12 +145,15 @@ export async function POST(request: NextRequest) {
             );
           }
 
-          return validatedActivity.data;
+          return { ...validatedActivity.data, createdAt: creationDate };
         });
 
         return {
           ...validatedTask.data,
-          activities: activities.filter((item: any) => item !== undefined),
+          createdAt: creationDate,
+          activities: {
+            create: activities.filter((item: any) => item !== undefined),
+          },
         };
       });
 
@@ -160,7 +166,10 @@ export async function POST(request: NextRequest) {
 
       return {
         ...validatedMilestone.data,
-        tasks,
+        createdAt: creationDate,
+        tasks: {
+          create: tasks,
+        },
       };
     });
   } catch (error) {
@@ -207,15 +216,27 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  //## convert date to ISO string
+  if (validatedSchema.data.startDate) {
+    validatedSchema.data.startDate = `${validatedSchema.data.startDate}T03:00:00Z`;
+  }
+
+  //## convert date to ISO string
+  if (validatedSchema.data.endDate) {
+    validatedSchema.data.endDate = `${validatedSchema.data.endDate}T03:00:00Z`;
+  }
+
   //--> CRIAR PRODUTO
   let registryData: any = null;
   try {
     registryData = await prisma.project.create({
       data: {
-        createdAt: new Date().toISOString(),
+        createdAt: creationDate,
         companyId: activeCompany?.id,
         ...validatedSchema.data,
-        milestones,
+        milestones: {
+          create: milestones,
+        },
       },
     });
   } catch (error) {

@@ -1,5 +1,9 @@
 import { z } from 'zod';
 import { tSelectMenuOption } from '../tSelectMenuOption';
+import {
+  tProjectMilestone,
+  tProjectMilestoneWithTasks,
+} from './tProjectMilestone';
 
 const typeLiterals = z.union([
   z.literal('PACKAGE'),
@@ -28,7 +32,7 @@ const statusLiterals = z.union([
   z.literal('REFUSED'),
   z.literal('IN_PROGRESS'),
   z.literal('COMPLETE'),
-  z.literal('CANCELED'),
+  z.literal('CANCEL'),
   z.literal('REVIEWED'),
 ]);
 
@@ -54,7 +58,7 @@ export const statusSelectOptions: tSelectMenuOption[] = [
     label: 'COMPLETO',
   },
   {
-    value: 'CANCELED',
+    value: 'CANCEL',
     label: 'CANCELADO',
   },
   {
@@ -156,7 +160,7 @@ export const reviewProjectValidate = z
 export const projectValidate = z
   .object({
     id: z.string().trim().min(1).optional(),
-    version: z.coerce.number().nonnegative().optional(),
+    version: z.coerce.number().positive().optional(),
     isActive: z
       .boolean({
         invalid_type_error: 'isActive must be a boolean',
@@ -192,6 +196,7 @@ export const projectValidate = z
 
 export const projectTableRowValidate = z.object({
   id: z.string().trim().min(1),
+  version: z.coerce.number().positive().optional(),
   isActive: z.boolean({
     invalid_type_error: 'isActive must be a boolean',
   }),
@@ -215,3 +220,6 @@ export const projectTableRowValidate = z.object({
 export type tNewProject = z.infer<typeof newProjectValidate>;
 export type tProject = z.infer<typeof projectValidate>;
 export type tProjectTableRow = z.infer<typeof projectTableRowValidate>;
+export type tPtojectWithMilestones = tProject & {
+  milestones: tProjectMilestone[] | tProjectMilestoneWithTasks[];
+};

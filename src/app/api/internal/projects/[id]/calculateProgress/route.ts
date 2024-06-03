@@ -3,11 +3,15 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
 
+type tItemToUpdate = [string, number];
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
+  const tasksToUpdate: tItemToUpdate[] = [];
+  const milestonesToUpdate: tItemToUpdate[] = [];
 
   if (!session || !session.user.id) {
     return new NextResponse(
@@ -112,10 +116,10 @@ export async function POST(
     );
   }
 
-  const milestoneWeight = 100 / (projectItems.length * 100);
+  const milestoneWeight = 100 / projectItems.length / 100;
 
   const overallProgress = projectItems.reduce((projectProgress, milestone) => {
-    const taskWeight = 100 / (milestone.tasks.length * 100);
+    const taskWeight = 100 / milestone.tasks.length / 100;
 
     const updatedMilestoneProgress = milestone.tasks.reduce(
       (milestoneProgress, task) => {
@@ -123,40 +127,60 @@ export async function POST(
           return milestoneProgress + taskWeight * task.progress;
         }
 
-        const activityWeight = 100 / (task.activities.length * 100);
+        const activityWeight = 100 / task.activities.length / 100;
         const updatedTaskProgress = task.activities.reduce(
           (taskProgress, activity) => {
             return taskProgress + activityWeight * activity.progress;
           },
           0,
         );
-        const updatedTask = prisma.projectTask.update({
-          where: {
-            id: task.id,
-          },
-          data: {
-            progress: updatedTaskProgress,
-          },
-        });
-        if (!updatedTask) throw new Error(`Error updating task ID: ${task.id}`);
+        tasksToUpdate.push([task.id, updatedTaskProgress]);
         return milestoneProgress + updatedTaskProgress;
       },
       0,
     );
 
-    const updatedMilestone = prisma.projectMilestone.update({
-      where: {
-        id: milestone.id,
-      },
-      data: {
-        progress: updatedMilestoneProgress,
-      },
-    });
-    if (!updatedMilestone)
-      throw new Error(`Error updating milestone ID: ${milestone.id}`);
-    return projectProgress + (updatedMilestoneProgress * milestoneWeight) / 100;
+    milestonesToUpdate.push([milestone.id, updatedMilestoneProgress]);
+    return projectProgress + updatedMilestoneProgress * milestoneWeight;
   }, 0);
 
+  //UPDATE TASKS
+  if (tasksToUpdate.length) {
+    for (let taskIdx = 0; taskIdx < tasksToUpdate.length; taskIdx++) {
+      const updatedTask = await prisma.projectTask.update({
+        where: {
+          id: tasksToUpdate[taskIdx][0],
+        },
+        data: {
+          progress: tasksToUpdate[taskIdx][1],
+        },
+      });
+      if (!updatedTask)
+        throw new Error(`Error updating task ID: ${tasksToUpdate[taskIdx][0]}`);
+    }
+  }
+
+  //UPDATE MILESTONES
+  if (milestonesToUpdate.length) {
+    for (
+      let milestoneIdx = 0;
+      milestoneIdx < milestonesToUpdate.length;
+      milestoneIdx++
+    ) {
+      const updatedMilestone = await prisma.projectMilestone.update({
+        where: {
+          id: milestonesToUpdate[milestoneIdx][0],
+        },
+        data: {
+          progress: milestonesToUpdate[milestoneIdx][1],
+        },
+      });
+      if (!updatedMilestone)
+        throw new Error(
+          `Error updating task ID: ${milestonesToUpdate[milestoneIdx][0]}`,
+        );
+    }
+  }
   const updatedProject = await prisma.project.update({
     where: {
       projectId: { id: projectData.id, version: projectData.version },

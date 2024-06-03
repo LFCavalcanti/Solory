@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { tSelectMenuOption } from '../tSelectMenuOption';
+import { tProjectActivity } from './tProjectActivity';
 
 const statusLiterals = z.union([
   z.literal('CREATED'),
@@ -52,7 +53,7 @@ export const newProjectTaskValidate = z
     effortUnit: effortLiterals,
     effortQuantity: z.coerce.number().nonnegative(),
     effortBalance: z.coerce.number().nonnegative(),
-    milestoneId: z.string(),
+    // milestoneId: z.string(),
   })
   .superRefine((task, ctx) => {
     if (task.effortUnit === 'NONE' && task.effortQuantity !== 0) {
@@ -68,7 +69,7 @@ export const newProjectTaskValidate = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Se o tipo de esforço for HORAS ou UNIDADES então deve ter quantidade maior que zero.`,
-        path: ['status'],
+        path: ['effortQuantity'],
         fatal: true,
       });
       return;
@@ -80,7 +81,7 @@ export const newProjectTaskValidate = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Quantidade e Saldo de esforço devem ser iguais.`,
-        path: ['status'],
+        path: ['effortBalance'],
         fatal: true,
       });
       return;
@@ -142,3 +143,6 @@ export const projectTaskTableRowValidate = z.object({
 export type tNewProjectTask = z.infer<typeof newProjectTaskValidate>;
 export type tProjectTask = z.infer<typeof projectTaskValidate>;
 export type tProjectTaskTableRow = z.infer<typeof projectTaskTableRowValidate>;
+export type tProjectTaskWithActivities = tProjectTask & {
+  activities: tProjectActivity[];
+};

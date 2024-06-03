@@ -52,7 +52,7 @@ export const newProjectActivityValidate = z
     effortUnit: effortLiterals,
     effortQuantity: z.coerce.number().nonnegative(),
     effortBalance: z.coerce.number().nonnegative(),
-    taskId: z.string(),
+    // taskId: z.string(),
   })
   .superRefine((activity, ctx) => {
     if (activity.effortUnit === 'NONE' && activity.effortQuantity !== 0) {
@@ -68,7 +68,7 @@ export const newProjectActivityValidate = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Se o tipo de esforço for HORAS ou UNIDADES então deve ter quantidade maior que zero.`,
-        path: ['status'],
+        path: ['effortQuantity'],
         fatal: true,
       });
       return;

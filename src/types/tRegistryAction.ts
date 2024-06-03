@@ -1,1 +1,8 @@
-export type tRegistryAction = 'insert' | 'view' | 'edit' | 'delete' | null;
+export type tRegistryAction =
+  | 'insert'
+  | 'view'
+  | 'edit'
+  | 'delete'
+  | 'review'
+  | 'exclude'
+  | null;

@@ -17,7 +17,7 @@ export async function POST(
 ) {
   const body = await request.json();
   const session = await getServerSession(authOptions);
-  const currentDate = new Date().toISOString();
+  const creationDate = new Date().toISOString();
 
   if (!session || !session.user.id) {
     return new NextResponse(
@@ -125,26 +125,31 @@ export async function POST(
       // BUSINESS RULE
       // If the project is linked to a contract, then milestones need to be linked to a VALID contract ID
       if (
-        validatedMilestone.data.contractItemId &&
-        !contractItems.findIndex(
-          (item: tContractItem) =>
-            item.id === validatedMilestone.data.contractItemId,
-        )
+        validatedSchema.data.status === 'APPROVED' &&
+        (!validatedMilestone.data.contractItemId ||
+          (validatedMilestone.data.contractItemId &&
+            !contractItems.findIndex(
+              (item: tContractItem) =>
+                item.id === validatedMilestone.data.contractItemId,
+            )))
       ) {
         throw new Error(
-          'Projects linked to a ContractID, Milestones need to be linked to a VALID contract item.',
+          'For contracts with APPROVED status, milestones need to be linked to a VALID contract item.',
         );
       }
 
-      let tasks = milestones.tasks.map((task: any) => {
+      let tasks = milestone.tasks.map((task: any) => {
         const validatedTask = newProjectTaskValidate.safeParse(task);
         if (!validatedTask.success) {
           console.error(validatedTask.error);
           throw new Error(`Invalid data for Task: ${validatedTask.error}`);
         }
 
-        if (!task.activities || task.activities.length) {
-          return validatedTask.data;
+        if (!task.activities || !task.activities.length) {
+          return {
+            ...validatedTask.data,
+            createdAt: creationDate,
+          };
         }
 
         const activities = task.activities.map((activity: any) => {
@@ -158,12 +163,15 @@ export async function POST(
             );
           }
 
-          return validatedActivity.data;
+          return { ...validatedActivity.data, createdAt: creationDate };
         });
 
         return {
           ...validatedTask.data,
-          activities: activities.filter((item: any) => item !== undefined),
+          createdAt: creationDate,
+          activities: {
+            create: activities.filter((item: any) => item !== undefined),
+          },
         };
       });
 
@@ -176,7 +184,10 @@ export async function POST(
 
       return {
         ...validatedMilestone.data,
-        tasks,
+        createdAt: creationDate,
+        tasks: {
+          create: tasks,
+        },
       };
     });
   } catch (error) {
@@ -249,6 +260,16 @@ export async function POST(
     );
   }
 
+  //## convert date to ISO string
+  if (validatedSchema.data.startDate) {
+    validatedSchema.data.startDate = `${validatedSchema.data.startDate}T03:00:00Z`;
+  }
+
+  //## convert date to ISO string
+  if (validatedSchema.data.endDate) {
+    validatedSchema.data.endDate = `${validatedSchema.data.endDate}T03:00:00Z`;
+  }
+
   // 3 - Gravar novos itens
   let reviewedProject: any = null;
   try {
@@ -256,10 +277,12 @@ export async function POST(
       data: {
         id: projectData.id,
         version: projectData.version + 1,
-        createdAt: new Date().toISOString(),
+        createdAt: creationDate,
         companyId: activeCompany?.id,
         ...validatedSchema.data,
-        milestones,
+        milestones: {
+          create: milestones,
+        },
       },
     });
   } catch (error) {
@@ -294,14 +317,14 @@ export async function POST(
       throw new Error('No milestone found. Invalid Project or need permission');
     }
 
-    currProjectItems.forEach((milestone) => {
-      prisma.projectMilestone.update({
+    currProjectItems.forEach(async (milestone) => {
+      await prisma.projectMilestone.update({
         where: {
           id: milestone.id,
         },
         data: {
           isActive: false,
-          disabledAt: currentDate,
+          disabledAt: creationDate,
         },
       });
 
@@ -309,26 +332,26 @@ export async function POST(
         throw new Error('No tasks found. Invalid Project or need permission');
       }
 
-      milestone.tasks.forEach((task) => {
-        prisma.projectTask.update({
+      milestone.tasks.forEach(async (task) => {
+        await prisma.projectTask.update({
           where: {
             id: task.id,
           },
           data: {
             isActive: false,
-            disabledAt: currentDate,
+            disabledAt: creationDate,
           },
         });
 
         if (task.activities) {
-          task.activities.forEach((activity) => {
-            prisma.projectActivity.update({
+          task.activities.forEach(async (activity) => {
+            await prisma.projectActivity.update({
               where: {
                 id: activity.id,
               },
               data: {
                 isActive: false,
-                disabledAt: currentDate,
+                disabledAt: creationDate,
               },
             });
           });
@@ -342,6 +365,7 @@ export async function POST(
       },
       data: {
         status: 'REVIEWED',
+        isActive: false,
       },
     });
   } catch (error) {

@@ -26,18 +26,30 @@ export async function GET(
   const registryList = await prisma.projectMilestone.findMany({
     where: {
       projectId: params.id,
-      ...(onlyActive === 'true' && { isActive: true }),
+      ...((onlyActive === 'true' || tableList === 'true') && {
+        isActive: true,
+      }),
     },
     ...(tableList === 'true' && {
-      select: {
-        id: true,
-        order: true,
-        description: true,
-        status: true,
-        progress: true,
-        isActive: true,
-        createdAt: true,
-        disabledAt: true,
+      include: {
+        tasks: {
+          where: {
+            isActive: true,
+          },
+          include: {
+            activities: {
+              where: {
+                isActive: true,
+              },
+              orderBy: {
+                order: 'asc',
+              },
+            },
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     }),
     ...(orderBy === 'id' && {
@@ -46,6 +58,11 @@ export async function GET(
       },
     }),
     ...(orderBy === 'order' && {
+      orderBy: {
+        order: 'asc',
+      },
+    }),
+    ...(tableList === 'true' && {
       orderBy: {
         order: 'asc',
       },
