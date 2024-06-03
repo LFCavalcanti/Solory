@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "migrate:dev": "prisma migrate dev && prisma generate",
-    "push:db:dev": "prisma db push",
+    "push:db:dev": "prisma db push && prisma generate",
     "prisma:reset": "prisma migrate reset"
   },
   "dependencies": {
@@ -43,11 +43,11 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/lodash.debounce": "^4.0.9",
-    "@types/node": "^20.10.4",
-    "@types/pg": "^8.10.9",
-    "@types/react": "^18.2.43",
-    "@types/react-csv": "^1.1.9",
-    "@types/react-dom": "^18.2.17",
+    "@types/node": "^20.14.0",
+    "@types/pg": "^8.11.6",
+    "@types/react": "^18.3.3",
+    "@types/react-csv": "^1.1.10",
+    "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
     "autoprefixer": "^10.4.16",
@@ -66,6 +66,6 @@
     "prettier": "^3.1.1",
     "prisma": "^5.7.0",
     "tailwindcss": "^3.3.6",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.5"
   }
 }
