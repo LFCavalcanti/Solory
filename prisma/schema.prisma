@@ -50,6 +50,7 @@ model User {
   companies     UserToCompany[]
   emailValidationTokens emailValidationToken[]
   settings      UserSettings[]
+  serviceOrders ServiceOrder[]
 }
 
 model UserSettings {
@@ -134,6 +135,7 @@ model Company {
   customers       Customer[]
   contracts Contract[]
   projects Project[]
+  serviceOrders ServiceOrder[]
 
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
@@ -329,6 +331,7 @@ model Contract {
   customerId String
   items    ContractItem[]
   projects    Project[]
+  serviceOrders ServiceOrder[]
 }
 
 model ContractItem {
@@ -343,6 +346,7 @@ model ContractItem {
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
   contractId String
   projectMilestones ProjectMilestone[]
+  serviceOrders ServiceOrder[]
 }
 
 model Customer {
@@ -366,6 +370,7 @@ model Customer {
   contacts    CustomerContact[]
   contracts Contract[]
   projects Project[]
+  serviceOrders ServiceOrder[]
 
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
@@ -389,6 +394,7 @@ model CustomerAddress {
   cities   cities @relation(fields: [cityCode], references: [code])
   cityCode String
   information String? @db.Text
+  serviceOrders ServiceOrder[]
   @@index([isActive, customerId, isMainAddress])
 }
 
@@ -428,6 +434,8 @@ model Project {
   companyId String
   milestones ProjectMilestone[]
   @@id(name: "projectId", [id, version])
+  @@index([id, customerId, contractId])
+  @@index([companyId, customerId, contractId, id])
 }
 
 model ProjectMilestone {
@@ -447,6 +455,8 @@ model ProjectMilestone {
   projectId String
   ProjectVersion Int
   tasks ProjectTask[]
+  @@index([id, projectId, contractItemId])
+  @@index([projectId, contractItemId, id])
 }
 
 model ProjectTask {
@@ -465,6 +475,8 @@ model ProjectTask {
   milestone ProjectMilestone? @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
   milestoneId String?
   activities ProjectActivity[]
+  @@index([id, milestoneId])
+  @@index([milestoneId,id])
 }
 
 model ProjectActivity {
@@ -482,4 +494,41 @@ model ProjectActivity {
   effortBalance Float
   task   ProjectTask @relation(fields: [taskId], references: [id])
   taskId String
+  @@index([id, taskId])
+  @@index([taskId,id])
+}
+
+model ServiceOrder {
+  id  String @id @default(cuid())
+  orderCode String
+  isActive     Boolean @default(true)
+  createdAt       DateTime
+  disabledAt      DateTime?
+  company Company @relation(fields: [companyId], references:[id], onDelete: Cascade)
+  companyId String
+  customer Customer @relation(fields: [customerId], references:[id], onDelete: Cascade)
+  customerId String
+  customerAddress CustomerAddress? @relation(fields: [customerAddressId], references: [id], onDelete: Cascade)
+  customerAddressId String?
+  contract Contract @relation(fields: [contractId], references:[id], onDelete: Cascade)
+  contractId String
+  contractItem ContractItem @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
+  contractItemId String
+  user User @relation(fields: [analistId], references:[id], onDelete: Cascade)
+  analistId String
+  orderDate DateTime
+  startTime DateTime
+  endTime DateTime
+  breakTotal Float
+  totalWork Float
+  type String
+  serviceSummary String
+  tasksText String @db.Text
+  notesText String @db.Text
+  meals Int
+  travel Boolean
+  @@unique([id, companyId, orderCode])
+  @@index([id, customerId, contractId])
+  @@index([customerId, contractId, orderCode])
+  @@index([companyId, customerId, contractId, orderCode, id])
 }
