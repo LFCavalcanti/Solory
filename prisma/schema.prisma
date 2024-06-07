@@ -51,6 +51,7 @@ model User {
   emailValidationTokens emailValidationToken[]
   settings      UserSettings[]
   serviceOrders ServiceOrder[]
+  serviceOrderEvents ServiceOrderEvent[]
 }
 
 model UserSettings {
@@ -504,6 +505,7 @@ model ServiceOrder {
   isActive     Boolean @default(true)
   createdAt       DateTime
   disabledAt      DateTime?
+  status String
   company Company @relation(fields: [companyId], references:[id], onDelete: Cascade)
   companyId String
   customer Customer @relation(fields: [customerId], references:[id], onDelete: Cascade)
@@ -514,8 +516,8 @@ model ServiceOrder {
   contractId String
   contractItem ContractItem @relation(fields: [contractItemId], references: [id], onDelete: Cascade)
   contractItemId String
-  user User @relation(fields: [analistId], references:[id], onDelete: Cascade)
-  analistId String
+  user User @relation(fields: [analystId], references:[id], onDelete: Cascade)
+  analystId String
   orderDate DateTime
   startTime DateTime
   endTime DateTime
@@ -527,8 +529,21 @@ model ServiceOrder {
   notesText String @db.Text
   meals Int
   travel Boolean
+  events ServiceOrderEvent[]
   @@unique([id, companyId, orderCode])
   @@index([id, customerId, contractId])
   @@index([customerId, contractId, orderCode])
   @@index([companyId, customerId, contractId, orderCode, id])
+}
+
+model ServiceOrderEvent {
+  id  String @id @default(cuid())
+  serviceOrder ServiceOrder @relation(fields: [serviceOrderId], references:[id], onDelete: Cascade)
+  serviceOrderId String
+  timeStamp DateTime
+  eventType String
+  isActionAutomatic Boolean
+  description String
+  user User? @relation(fields: [userId], references:[id], onDelete: Cascade)
+  userId String?
 }
