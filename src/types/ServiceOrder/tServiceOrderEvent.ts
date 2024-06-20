@@ -10,6 +10,7 @@ const typeLiterals = z.union([
   z.literal('CANCELLED_BILLING'),
   z.literal('SUPRESSED_ON_BILL'),
   z.literal('OTHER'),
+  z.literal('CANCELLED'),
 ]);
 
 export const typeSelectOptions: tSelectMenuOption[] = [
@@ -44,6 +45,10 @@ export const typeSelectOptions: tSelectMenuOption[] = [
   {
     value: 'OTHER',
     label: 'OUTROS',
+  },
+  {
+    value: 'CANCELED',
+    label: 'CANCELADA',
   },
 ];
 

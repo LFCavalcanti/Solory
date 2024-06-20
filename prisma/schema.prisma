@@ -526,7 +526,7 @@ model ServiceOrder {
   type String
   serviceSummary String
   tasksText String @db.Text
-  notesText String @db.Text
+  notesText String? @db.Text
   meals Int
   travel Boolean
   events ServiceOrderEvent[]

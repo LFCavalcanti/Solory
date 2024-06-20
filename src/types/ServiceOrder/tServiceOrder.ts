@@ -29,6 +29,7 @@ const statusLiterals = z.union([
   z.literal('TIMEOUT_APPROVED'),
   z.literal('REFUSED'),
   z.literal('BILLED'),
+  z.literal('CANCELED'),
 ]);
 
 export const statusSelectOptions: tSelectMenuOption[] = [
@@ -56,13 +57,16 @@ export const statusSelectOptions: tSelectMenuOption[] = [
     value: 'BILLED',
     label: 'FATURADA',
   },
+  {
+    value: 'CANCELED',
+    label: 'CANCELADA',
+  },
 ];
 
 export const newServiceOrderValidate = z
   .object({
     orderCode: z.string().trim().min(1).max(10).toUpperCase(),
     status: statusLiterals,
-    companyId: z.string().trim().min(1),
     customerId: z.string().trim().min(1),
     customerAddressId: z.string().trim().min(1).optional(),
     contractId: z.string().trim().min(1),
@@ -106,31 +110,77 @@ export const newServiceOrderValidate = z
 
 export const serviceOrderValidate = z
   .object({
-    id: z.string().trim().min(1),
-    orderCode: z.string().trim().min(1).max(10).toUpperCase(),
-    isActive: z.boolean(),
-    createdAt: z.string(),
+    id: z.string().trim().min(1).optional(),
+    orderCode: z.string().trim().min(1).max(10).toUpperCase().optional(),
+    isActive: z.boolean().optional(),
+    createdAt: z.string().optional(),
     disabledAt: z.string().optional(),
-    status: statusLiterals,
-    companyId: z.string().trim().min(1),
-    customerId: z.string().trim().min(1),
+    status: statusLiterals.optional(),
+    companyId: z.string().trim().min(1).optional(),
+    customerId: z.string().trim().min(1).optional(),
     customerAddressId: z.string().trim().min(1).optional(),
-    contractId: z.string().trim().min(1),
-    contractItemId: z.string().trim().min(1),
-    analystId: z.string().trim().min(1),
-    orderDate: z.string(),
-    startTime: z.string(),
-    endTime: z.string(),
-    breakTotal: z.coerce.number().nonnegative(),
-    totalWork: z.coerce.number().nonnegative(),
-    type: typeLiterals,
-    serviceSummary: z.string().min(1).max(500).toUpperCase(),
-    tasksText: z.string().min(1).max(20000),
-    notesText: z.string().max(20000).optional(),
-    meals: z.coerce.number().nonnegative(),
-    travel: z.boolean(),
+    contractId: z.string().trim().min(1).optional(),
+    contractItemId: z.string().trim().min(1).optional(),
+    analystId: z.string().trim().min(1).optional(),
+    orderDate: z.string().optional(),
+    startTime: z.string().optional(),
+    endTime: z.string().optional(),
+    breakTotal: z.coerce.number().nonnegative().optional(),
+    totalWork: z.coerce.number().nonnegative().optional(),
+    type: typeLiterals.optional(),
+    serviceSummary: z.string().min(1).max(500).toUpperCase().optional(),
+    tasksText: z.string().min(1).max(20000).optional(),
+    notesText: z.string().max(20000).optional().optional(),
+    meals: z.coerce.number().nonnegative().optional(),
+    travel: z.boolean().optional(),
   })
   .superRefine((serviceOrder, ctx) => {
+    if (
+      serviceOrder.type === 'ON_SITE_SCHEDULE' &&
+      !serviceOrder.customerAddressId
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `AGENDAS PRESENCIAIS devem estar associadas com um endereço de cliente`,
+        path: ['customerAddressId'],
+        fatal: true,
+      });
+      return;
+    }
+  });
+
+export const serviceOrderDraftValidate = z
+  .object({
+    id: z.string().trim().min(1).optional(),
+    orderCode: z.string().trim().min(1).max(10).toUpperCase().optional(),
+    isActive: z.boolean().optional(),
+    status: statusLiterals.optional(),
+    customerAddressId: z.string().trim().min(1).optional(),
+    contractId: z.string().trim().min(1).optional(),
+    contractItemId: z.string().trim().min(1).optional(),
+    analystId: z.string().trim().min(1).optional(),
+    orderDate: z.string().optional(),
+    startTime: z.string().optional(),
+    endTime: z.string().optional(),
+    breakTotal: z.coerce.number().nonnegative().optional(),
+    totalWork: z.coerce.number().nonnegative().optional(),
+    type: typeLiterals.optional(),
+    serviceSummary: z.string().min(1).max(500).toUpperCase().optional(),
+    tasksText: z.string().min(1).max(20000).optional(),
+    notesText: z.string().max(20000).optional().optional(),
+    meals: z.coerce.number().nonnegative().optional(),
+    travel: z.boolean().optional(),
+  })
+  .superRefine((serviceOrder, ctx) => {
+    if (serviceOrder.status !== 'DRAFT' && serviceOrder.status !== 'ISSUED') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Uma nova Ordem de Serviço só pode estar em RASCUNHO ou EMITIDA`,
+        path: ['status'],
+        fatal: true,
+      });
+      return;
+    }
     if (
       serviceOrder.type === 'ON_SITE_SCHEDULE' &&
       !serviceOrder.customerAddressId
@@ -160,6 +210,7 @@ export const serviceOrderTableRowValidate = z.object({
 
 export type tNewServiceOrder = z.infer<typeof newServiceOrderValidate>;
 export type tServiceOrder = z.infer<typeof serviceOrderValidate>;
+export type tServiceOrderDraft = z.infer<typeof serviceOrderDraftValidate>;
 export type tServiceOrderTableRow = z.infer<
   typeof serviceOrderTableRowValidate
 >;
