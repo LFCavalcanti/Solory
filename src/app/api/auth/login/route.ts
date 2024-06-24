@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import signAccessToken from '@/lib/tokens/signAccessToken';
+import { tUserMinimal } from '@/types/User/tUser';
 import * as bcrypt from 'bcrypt';
 
 interface requestBody {
@@ -21,7 +22,8 @@ export async function POST(request: Request) {
       user.password &&
       (await bcrypt.compare(body.password, user.password))
     ) {
-      const { password, ...userWithoutPass } = user;
+      const userWithoutPass: Partial<tUserMinimal> = user;
+      delete userWithoutPass.password;
       const accessToken = await signAccessToken(
         JSON.stringify(userWithoutPass),
       );

@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma';
+import { tUserMinimal } from '@/types/User/tUser';
 import * as bcrypt from 'bcrypt';
 
 interface RequestBody {
@@ -29,9 +30,10 @@ export async function POST(request: Request) {
       },
     });
 
-    const { password, ...result } = user;
+    const userWithoutPass: Partial<tUserMinimal> = user;
+    delete userWithoutPass.password;
 
-    return new Response(JSON.stringify(result));
+    return new Response(JSON.stringify(userWithoutPass));
   } catch (err) {
     console.error(err);
     return new Response(JSON.stringify('Service unavailable'), {

@@ -35,3 +35,12 @@ export type tUserProfileData = {
   emailVerified: Date | null;
   image: string | null;
 };
+
+export type tUserMinimal = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  emailVerified: Date | null;
+  password: string | null;
+  image: string | null;
+};

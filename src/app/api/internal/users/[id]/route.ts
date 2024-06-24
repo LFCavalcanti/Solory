@@ -1,5 +1,6 @@
 // import { verifyJwt } from '@/lib/jwt';
 import prisma from '@/lib/prisma';
+import { tUserMinimal } from '@/types/User/tUser';
 //import { tUserProfile } from '@/types/User/tUser';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -16,15 +17,16 @@ export async function GET(
   });
 
   if (user) {
-    const { password, ...userWithoutPass } = user;
+    const userWithoutPass: Partial<tUserMinimal> = user;
+    delete userWithoutPass.password;
     return NextResponse.json(userWithoutPass);
   }
 
-  return new Response(JSON.stringify(null));
+  return new NextResponse(JSON.stringify(null));
 }
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   const newUserData = await request.json();
@@ -33,7 +35,7 @@ export async function PUT(
   let changedPassword = false;
 
   if (!newUserData)
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: 'User data not informed',
       }),
@@ -49,7 +51,7 @@ export async function PUT(
   });
 
   if (!userData)
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: 'User not found',
       }),
@@ -67,7 +69,7 @@ export async function PUT(
       newUserData.currentPassword &&
       !(await bcrypt.compare(newUserData.currentPassword, userData.password))
     ) {
-      return new Response(
+      return new NextResponse(
         JSON.stringify(
           'To alter your password, you need to type the current one.',
         ),
@@ -95,9 +97,10 @@ export async function PUT(
     });
 
     if (updatedUser) {
-      const { password, ...userWithoutPass } = updatedUser;
+      const userWithoutPass: Partial<tUserMinimal> = updatedUser;
+      delete userWithoutPass.password;
 
-      return new Response(
+      return new NextResponse(
         JSON.stringify({ ...userWithoutPass, changedEmail, changedPassword }),
       );
     }
@@ -111,7 +114,7 @@ export async function PUT(
       } else {
         errorMessage = 'Database error updating registry';
       }
-      return new Response(
+      return new NextResponse(
         JSON.stringify({
           message: errorMessage,
         }),
@@ -121,7 +124,7 @@ export async function PUT(
       );
     }
 
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: 'Server error',
       }),
@@ -131,5 +134,5 @@ export async function PUT(
     );
   }
 
-  return new Response(JSON.stringify(null));
+  return new NextResponse(JSON.stringify(null));
 }
