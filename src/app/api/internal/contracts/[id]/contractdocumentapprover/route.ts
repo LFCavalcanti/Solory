@@ -9,6 +9,7 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   const onlyActive = request.nextUrl.searchParams.get('onlyActive');
+  const tableList = request.nextUrl.searchParams.get('tableList');
   const session = await getServerSession(authOptions);
   if (!session || !session.user.id) {
     return new NextResponse(
@@ -22,6 +23,21 @@ export async function GET(
   }
 
   const registryList = await prisma.contractDocumentApprover.findMany({
+    ...(tableList === 'true' && {
+      select: {
+        id: true,
+        isActive: true,
+        contractId: true,
+        customerContactId: true,
+        approveServiceOrder: true,
+        customerContact: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    }),
     where: {
       contractId: params.id,
       ...(onlyActive === 'true' && { isActive: true }),

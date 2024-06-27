@@ -11,7 +11,7 @@ export async function GET(
   const onlyActive = request.nextUrl.searchParams.get('onlyActive');
   const session = await getServerSession(authOptions);
   if (!session || !session.user.id) {
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: 'Invalid Session',
       }),
@@ -28,7 +28,7 @@ export async function GET(
     },
   });
   if (!registryList) {
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: `### Customer Addresses for ID ${params.id} does not exist or insufficient permission`,
       }),
@@ -38,7 +38,7 @@ export async function GET(
     );
   }
 
-  return new Response(JSON.stringify(registryList));
+  return new NextResponse(JSON.stringify(registryList));
 }
 
 export async function POST(

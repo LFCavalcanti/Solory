@@ -52,7 +52,6 @@ model User {
   settings      UserSettings[]
   serviceOrders ServiceOrder[]
   serviceOrderEvents ServiceOrderEvent[]
-  contractDocumentApprovers ContractDocumentApprover[]
 }
 
 model UserSettings {
@@ -352,6 +351,9 @@ model ContractItem {
   contractId String
   projectMilestones ProjectMilestone[]
   serviceOrders ServiceOrder[]
+  @@index([isActive, id])
+  @@index([isActive, id, contractId])
+  @@index([isActive, id, contractId, productId])
 }
 
 model ContractDocumentApprover {
@@ -359,10 +361,12 @@ model ContractDocumentApprover {
   isActive     Boolean @default(true)
   contractId String
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  email String
+  customerContactId String
+  customerContact CustomerContact @relation(fields: [customerContactId], references: [id])
   approveServiceOrder Boolean
+  @@index([isActive, id])
+  @@index([isActive, id, contractId])
+  @@index([isActive, id, contractId, customerContactId])
 }
 
 model Customer {
@@ -425,6 +429,7 @@ model CustomerContact {
   phone String
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  contractDocumentApprovers ContractDocumentApprover[]
   @@index([isActive, customerId, id])
   @@index([isActive, customerId, email])
 }

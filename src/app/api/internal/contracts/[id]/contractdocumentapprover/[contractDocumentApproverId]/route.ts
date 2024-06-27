@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
 import { contractDocumentApproverValidate } from '@/types/Contract/tContractDocumentApprover';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
@@ -27,7 +28,8 @@ export async function GET(
   });
 
   if (!registryData) {
-    return new Response(
+    console.error(registryData);
+    return new NextResponse(
       JSON.stringify({
         message: `### ID ${params.contractDocumentApproverId} does not exist or insufficient permission`,
       }),
@@ -40,14 +42,14 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string; contractDocumentApproverId: string } },
 ) {
   const session = await getServerSession(authOptions);
   const body = await request.json();
 
   if (!session || !session.user.id) {
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: 'Invalid Session',
       }),
@@ -58,7 +60,7 @@ export async function PUT(
   }
 
   if (body.id) {
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: 'Entity Id must not be present in payload body',
       }),
@@ -72,7 +74,7 @@ export async function PUT(
   const validatedSchema = contractDocumentApproverValidate.safeParse(body);
   if (!validatedSchema.success) {
     console.error(validatedSchema.error);
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: 'Incorrect payload',
       }),
@@ -82,7 +84,7 @@ export async function PUT(
     );
   }
 
-  const currRegistry = await prisma.contractItem.findFirst({
+  const currRegistry = await prisma.contractDocumentApprover.findFirst({
     where: {
       id: params.contractDocumentApproverId,
       contractId: params.id,
@@ -90,7 +92,8 @@ export async function PUT(
   });
 
   if (!currRegistry) {
-    return new Response(
+    console.error(currRegistry);
+    return new NextResponse(
       JSON.stringify({
         message: `### ID ${params.contractDocumentApproverId} does not exist or insufficient permission`,
       }),
@@ -100,7 +103,7 @@ export async function PUT(
     );
   }
 
-  const updatedRegistry = await prisma.contractItem.update({
+  const updatedRegistry = await prisma.contractDocumentApprover.update({
     where: { id: params.contractDocumentApproverId },
     data: {
       ...validatedSchema.data,
@@ -108,7 +111,7 @@ export async function PUT(
   });
 
   if (!updatedRegistry) {
-    return new Response(
+    return new NextResponse(
       JSON.stringify({
         message: 'Error updating contract item',
       }),
@@ -118,5 +121,5 @@ export async function PUT(
     );
   }
 
-  return new Response(JSON.stringify(updatedRegistry));
+  return new NextResponse(JSON.stringify(updatedRegistry));
 }

@@ -56,3 +56,22 @@ export const contractItemTableColumns: ColumnDef<tRegistryColumnDef, any>[] = [
     accessorKey: 'description',
   },
 ];
+
+export const contractDocumentApproverTableColumns: ColumnDef<
+  tRegistryColumnDef,
+  any
+>[] = [
+  {
+    header: 'Status',
+    accessorKey: 'isActive',
+    cell: (info) => (info.getValue() ? 'ATIVO' : 'INATIVO'),
+  },
+  {
+    header: 'Nome',
+    accessorKey: 'customerContact.name',
+  },
+  {
+    header: 'E-mail',
+    accessorKey: 'customerContact.email',
+  },
+];

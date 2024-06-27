@@ -65,12 +65,18 @@ import {
 } from '@/types/Contract/tContract';
 import { tContractItem } from '@/types/Contract/tContractItem';
 import { useContractItemStore } from '@/lib/hooks/state/useContractItemStore';
-import { contractItemTableColumns } from '../../registerFields';
+import {
+  contractItemTableColumns,
+  contractDocumentApproverTableColumns,
+} from '../../registerFields';
 import ContractItemForm from '../contractItemForm';
 import { Select as AltSelect, ChakraStylesConfig } from 'chakra-react-select';
 import { tCustomer } from '@/types/Customer/tCustomer';
 import { tSelectMenuOption } from '@/types/tSelectMenuOption';
 import getFormLocaleDate from '@/lib/getFormLocaleDate';
+import { useContractDocumentApproverStore } from '@/lib/hooks/state/useContractDocumentApproverStore';
+import { tContractDocumentApprover } from '@/types/Contract/tContractDocumentApprover';
+import ContractDocumentApproverForm from '../contractDocumentApproverForm';
 
 export default function ContractForm() {
   const router = useRouter();
@@ -119,11 +125,24 @@ export default function ContractForm() {
   const [itemFormAction, setItemFormAction] = useState<tRegistryAction>(null);
   const [selectedItem, setSelectedItem] = useState<tContractItem | null>(null);
 
+  const [isDocumentApproverFormOpen, setDocumentApproverFormOpen] =
+    useState(false);
+  const [documentApproverFormAction, setDocumentApproverFormAction] =
+    useState<tRegistryAction>(null);
+  const [selectedDocumentApprover, setSelectedDocumentApprover] =
+    useState<tContractDocumentApprover | null>(null);
+
   const [contractData, setContractData] = useState<tContract>();
 
   const [contractItemList, setContractItemList] = useContractItemStore(
     (state) => [state.contractItemList, state.setList],
   );
+
+  const [documentApproverList, setDocumentApproverList] =
+    useContractDocumentApproverStore((state) => [
+      state.contractDocumentApproverList,
+      state.setList,
+    ]);
 
   const [registryData, action, closeForm] = useRegistryFormStore((state) => [
     state.registryData,
@@ -148,6 +167,15 @@ export default function ContractForm() {
     setItemFormAction(action);
     setSelectedItem(cellData);
     setItemFormOpen(true);
+  };
+
+  const openDocumentApproverForm = (
+    cellData: tRegistryColumnDef | null,
+    action: tRegistryAction,
+  ) => {
+    setDocumentApproverFormAction(action);
+    setSelectedDocumentApprover(cellData);
+    setDocumentApproverFormOpen(true);
   };
 
   const itemColumns = useMemo<ColumnDef<tRegistryColumnDef, any>[]>(
@@ -198,6 +226,72 @@ export default function ContractForm() {
                       type="button"
                       icon={<BiBlock />}
                       onClick={() => openItemForm(cellData, 'delete')}
+                    >
+                      Desativar
+                    </MenuItem>
+                  </>
+                )}
+              </MenuList>
+            </Menu>
+          );
+        },
+      },
+    ],
+    [],
+  );
+
+  const documentApproverTableColumns = useMemo<
+    ColumnDef<tRegistryColumnDef, any>[]
+  >(
+    () => [
+      ...contractDocumentApproverTableColumns,
+      {
+        id: 'actionButtons',
+        header: 'Ações',
+        cell: ({ cell }) => {
+          const cellData = cell.row.original;
+          return (
+            <Menu>
+              <MenuButton
+                variant="tableMenu"
+                as={IconButton}
+                icon={<FaEllipsisVertical />}
+              />
+              <MenuList fontFamily="button" fontWeight="700">
+                <MenuItem
+                  fontFamily="button"
+                  fontWeight="500"
+                  fontSize="12px"
+                  color="text.standard"
+                  icon={<ViewIcon />}
+                  type="button"
+                  onClick={() => openDocumentApproverForm(cellData, 'view')}
+                >
+                  Visualizar
+                </MenuItem>
+                {(action === 'edit' || action === 'insert') && (
+                  <>
+                    <MenuItem
+                      fontFamily="button"
+                      fontWeight="500"
+                      fontSize="12px"
+                      color="text.standard"
+                      type="button"
+                      icon={<EditIcon />}
+                      onClick={() => openDocumentApproverForm(cellData, 'edit')}
+                    >
+                      Editar
+                    </MenuItem>
+                    <MenuItem
+                      fontFamily="button"
+                      fontWeight="500"
+                      fontSize="12px"
+                      color="text.standard"
+                      type="button"
+                      icon={<BiBlock />}
+                      onClick={() =>
+                        openDocumentApproverForm(cellData, 'delete')
+                      }
                     >
                       Desativar
                     </MenuItem>
@@ -305,6 +399,13 @@ export default function ContractForm() {
     getSortedRowModel: getSortedRowModel(),
   });
 
+  const documentApproverTable = useReactTable({
+    columns: documentApproverTableColumns,
+    data: documentApproverList,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
   useEffect(() => {
     startProcessingSpinner();
     fetchApp({
@@ -380,6 +481,17 @@ export default function ContractForm() {
           console.error(`FETCH ERROR: ${error}`);
           throw error;
         }),
+      fetchApp({
+        endpoint: `/api/internal/contracts/${rowData.data.id}/contractdocumentapprover?tableList=true`,
+        baseUrl: window.location.origin,
+      })
+        .then((result) => {
+          setDocumentApproverList(result.body);
+        })
+        .catch((error) => {
+          console.error(`FETCH ERROR: ${error}`);
+          throw error;
+        }),
     ]).then(() => stopProcessingSpinner());
   }, []);
 
@@ -392,6 +504,15 @@ export default function ContractForm() {
           isFormOpen={isItemFormOpen}
           setIsFormOpen={setItemFormOpen}
           itemData={selectedItem}
+          contractData={contractData}
+        />
+      )}
+      {isDocumentApproverFormOpen && (
+        <ContractDocumentApproverForm
+          formAction={documentApproverFormAction}
+          isFormOpen={isDocumentApproverFormOpen}
+          setIsFormOpen={setDocumentApproverFormOpen}
+          approverData={selectedDocumentApprover}
           contractData={contractData}
         />
       )}
@@ -429,6 +550,7 @@ export default function ContractForm() {
           <TabList>
             <Tab>Principal</Tab>
             <Tab>Itens</Tab>
+            <Tab>Aprovadores</Tab>
           </TabList>
           <TabPanels>
             {/* PRINCIPAL */}
@@ -984,9 +1106,88 @@ export default function ContractForm() {
                 </Table>
               </Flex>
             </TabPanel>
+            {/* APPROVERS */}
+            <TabPanel>
+              <Flex
+                alignItems="left"
+                justifyContent="flexStart"
+                flexDirection="column"
+                padding={4}
+                gap={2}
+              >
+                {(action === 'insert' || action === 'edit') && (
+                  <Button
+                    // eslint-disable-next-line react/jsx-no-undef
+                    leftIcon={<AddIcon />}
+                    variant="primaryOutline"
+                    onClick={() => openDocumentApproverForm(null, 'insert')}
+                    maxW={24}
+                    type="button"
+                  >
+                    Incluir
+                  </Button>
+                )}
+
+                <Table
+                  size="sm"
+                  variant="registryExport"
+                  maxWidth="100%"
+                  mt={4}
+                >
+                  <Thead>
+                    {documentApproverTable
+                      .getHeaderGroups()
+                      .map((headerGroup) => (
+                        <Tr key={headerGroup.id}>
+                          {headerGroup.headers.map((header) => {
+                            // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                            const meta: any = header.column.columnDef.meta;
+                            return (
+                              <Th
+                                key={header.id}
+                                onClick={header.column.getToggleSortingHandler()}
+                                isNumeric={meta?.isNumeric}
+                              >
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                              </Th>
+                            );
+                          })}
+                        </Tr>
+                      ))}
+                  </Thead>
+                  <Tbody>
+                    {documentApproverTable.getRowModel().rows.map((row) => (
+                      <Tr key={row.id}>
+                        {row.getVisibleCells().map((cell) => {
+                          // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
+                          const meta: any = cell.column.columnDef.meta;
+                          const rowData: any = row.original;
+                          return (
+                            <Td
+                              key={cell.id}
+                              isNumeric={meta?.isNumeric}
+                              color={
+                                rowData.isActive ? 'text.standard' : 'gray.400'
+                              }
+                            >
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </Td>
+                          );
+                        })}
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Flex>
+            </TabPanel>
           </TabPanels>
         </Tabs>
-
         <Button width={28} variant="primary" type="submit" mt={6}>
           {getButtonNameByAction(action)}
         </Button>
