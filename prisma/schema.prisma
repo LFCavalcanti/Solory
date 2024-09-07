@@ -52,6 +52,7 @@ model User {
   settings      UserSettings[]
   serviceOrders ServiceOrder[]
   serviceOrderEvents ServiceOrderEvent[]
+  businessRoles UserToBusinessRole[]
 }
 
 model UserSettings {
@@ -78,6 +79,33 @@ model emailValidationToken {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
   @@unique([identifier, token])
+}
+
+model BusinessRole {
+  id              String @id @default(cuid())
+  isActive        Boolean @default(true)
+  name            String
+  serviceOrder Boolean @default(false)
+  invoiceCalculate Boolean @default(false)
+  createdAt DateTime
+  disabledAt DateTime?
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
+  users UserToBusinessRole[]
+  @@unique([id, companyId])
+  @@unique([companyId, name])
+}
+
+model UserToBusinessRole {
+  id             String @id @default(cuid())
+  isActive         Boolean @default(true)
+  createdAt      DateTime
+  disabledAt DateTime?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  businessRole   BusinessRole     @relation(fields: [businessRoleId], references: [id], onDelete: Cascade)
+  businessRoleId String
+  @@unique([userId, businessRoleId])
 }
 
 model CompanyGroup {
@@ -125,6 +153,7 @@ model Company {
   isMei        Boolean @default(false)
   isSimplesNac Boolean @default(false)
   phone        String
+  serviceOrderPattern String @default("SEQUENCE")
   companyGroup         CompanyGroup     @relation(fields: [companyGroupId], references: [id], onDelete: Cascade)
   companyGroupId String
   users        UserToCompany[]
@@ -137,6 +166,7 @@ model Company {
   contracts Contract[]
   projects Project[]
   serviceOrders ServiceOrder[]
+  businessRoles BusinessRole[]
 
   @@unique([cnpj, companyGroupId])
   @@index([isActive, companyGroupId, cnpj])
@@ -552,7 +582,7 @@ model ServiceOrder {
   meals Int
   travel Boolean
   events ServiceOrderEvent[]
-  @@unique([id, companyId, orderCode])
+  @@unique([companyId, orderCode])
   @@index([id, customerId, contractId])
   @@index([customerId, contractId, orderCode])
   @@index([companyId, customerId, contractId, orderCode, id])

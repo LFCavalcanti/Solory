@@ -41,6 +41,11 @@ export const companyMenu: iMenuItem[] = [
     label: 'Fornecedores',
     destination: '/client/suppliers',
   },
+  {
+    key: 'businessRoles',
+    label: 'Papéis de Negócio',
+    destination: '/client/businessroles',
+  },
 ];
 
 export const customerMenu: iMenuItem[] = [

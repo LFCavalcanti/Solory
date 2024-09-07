@@ -2,11 +2,13 @@ import prisma from '@/lib/prisma';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth/next';
 import { NextRequest, NextResponse } from 'next/server';
+import { tSelectMenuOption } from '@/types/tSelectMenuOption';
 
 export async function GET(request: NextRequest) {
   const onlyActive = request.nextUrl.searchParams.get('onlyActive');
   const orderBy = request.nextUrl.searchParams.get('orderBy');
   const emailAddress = request.nextUrl.searchParams.get('emailAddress');
+  const selectOptions = request.nextUrl.searchParams.get('selectOptions');
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user.id) {
@@ -93,5 +95,14 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  if (selectOptions === 'true') {
+    const selectUserList: tSelectMenuOption[] = userList.map((user) => {
+      return {
+        value: user.id,
+        label: user.name || 'SEM NOME CADASTRADO',
+      };
+    });
+    return NextResponse.json(selectUserList);
+  }
   return NextResponse.json(userList);
 }

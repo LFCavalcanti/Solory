@@ -5,4 +5,5 @@ export type tRegistryAction =
   | 'delete'
   | 'review'
   | 'exclude'
+  | 'cancel'
   | null;
